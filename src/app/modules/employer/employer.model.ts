@@ -1,0 +1,42 @@
+import mongoose, { Document, Schema, Model } from "mongoose";
+import { ICompany, IEmployer, ISocialMedia } from "./employer.interface";
+
+const SocialMediaSchema = new Schema<ISocialMedia>({
+  website: { type: String },
+  linkedin: { type: String },
+  instagram: { type: String },
+  facebook: { type: String },
+});
+
+const CompanySchema = new Schema<ICompany>({
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  phone: { type: String, required: true },
+  verifications_no: { type: String, required: true },
+  locations: { type: String, required: true },
+  service: { type: String, required: true },
+  details: { type: String, required: true },
+});
+
+const EmployerSchema = new Schema<IEmployer>({
+  authId: { type: Schema.Types.ObjectId, required: true, ref: "Auth" },
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+  profile_image: { type: String, default: null },
+  phone_number: { type: String, default: null },
+  isPhoneNumberVerified: { type: Boolean, default: false },
+  company: { type: CompanySchema },
+  socialMedia: { type: SocialMediaSchema },
+  status: {
+    type: String,
+    enum: ["active", "deactivate"],
+    default: "active",
+  },
+}, {
+  timestamps: true,
+}
+);
+
+const Employer: Model<IEmployer> = mongoose.model<IEmployer>("Employer", EmployerSchema);
+
+export default Employer;
