@@ -27,6 +27,11 @@ const EmployerSchema = new Schema<IEmployer>({
   isPhoneNumberVerified: { type: Boolean, default: false },
   company: { type: CompanySchema },
   socialMedia: { type: SocialMediaSchema },
+  subscription_status: {
+    type: String,
+    enum: ["Active", "None", "Expired"],
+    default: "None",
+  },
   status: {
     type: String,
     enum: ["active", "deactivate"],

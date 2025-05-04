@@ -5,12 +5,11 @@ import { uploadFile } from '../../middlewares/fileUploader';
 import { AdminController } from '../admin/admin.controller';
 import { AuthController } from './auth.controller';
 import { UserController } from '../user/user.controller';
+import { EmployerController } from '../employer/employer.controller';
 
 const router = express.Router();
 //------ Auth Route -----------------
-router.post("/register",
-  // uploadFile(),
-  AuthController.registrationAccount)
+router.post("/register", AuthController.registrationAccount)
 router.post("/login", AuthController.loginAccount)
 router.post("/activate-user", AuthController.activateAccount)
 router.post("/active-resend", AuthController.resendCodeActivationAccount)
@@ -25,21 +24,29 @@ router.patch("/change-password",
     ENUM_USER_ROLE.ADMIN,
     ENUM_USER_ROLE.SUPER_ADMIN
   ),
-  AuthController.changePassword
-)
-
+  AuthController.changePassword)
 router.delete("/delete-account", AuthController.deleteMyAccount)
 router.patch("/block", AuthController.blockUnblockAuthUser)
-
-//------ User Router ---------------
-router.get("/profile", auth(ENUM_USER_ROLE.USER), UserController.getProfile)
-
-//------ Admin Router ---------------
-router.get(
-  "/profile",
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  AdminController.myProfile
+router.get("/profile",
+  auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  AuthController.myProfile
 );
+
+//------ User Router --------------- 
+router.patch(
+  "/user/edit-profile",
+  auth(ENUM_USER_ROLE.USER),
+  uploadFile(),
+  UserController.updateProfile);
+
+//------ User Router --------------- 
+router.patch(
+  "/employer/edit-profile",
+  auth(ENUM_USER_ROLE.EMPLOYER),
+  uploadFile(),
+  EmployerController.updateProfile);
+
+//------ Admin Router --------------- 
 router.patch(
   "/edit-profile",
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),

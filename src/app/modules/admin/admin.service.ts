@@ -60,16 +60,6 @@ const updateProfile = async (req: IRequest): Promise<IAdmin | null> => {
   return updateUser;
 };
 
-const myProfile = async (req: IRequest): Promise<IAdmin | null> => {
-  const { userId } = req.user;
-  const result = await Admin.findById(userId).populate("authId");
-  if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
-  }
-
-  return result;
-};
-
 const deleteMyAccount = async (payload: { email: string; password: string }): Promise<void> => {
   const { email, password } = payload;
 
@@ -91,7 +81,6 @@ const deleteMyAccount = async (payload: { email: string; password: string }): Pr
 
 export const AdminService = {
   updateProfile,
-  myProfile,
   deleteMyAccount,
 };
 

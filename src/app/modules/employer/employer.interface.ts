@@ -26,6 +26,7 @@ export type IEmployer = Document & {
   isPhoneNumberVerified: boolean;
   company: ICompany;
   socialMedia: ISocialMedia;
+  subscription_status: string;
   status: "active" | "deactivate";
   createdAt?: Date;
   updatedAt?: Date;

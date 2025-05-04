@@ -6,8 +6,6 @@ import { IAdds, ISubscriptions } from './dsashbaord.interface';
 import { Subscription } from './dashboard.model';
 import { IReqUser } from '../auth/auth.interface';
 
-
-
 const totalCount: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const result = await DashboardService.totalCount();
@@ -19,6 +17,7 @@ const totalCount: RequestHandler = catchAsync(
     });
   },
 );
+
 const getMonthlySubscriptionGrowth: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const year = req.query.year
@@ -48,7 +47,6 @@ const getMonthlyUserGrowth: RequestHandler = catchAsync(
     });
   },
 );
-
 
 const getAllUser: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
@@ -116,7 +114,6 @@ const getAllSubscription: RequestHandler = catchAsync(
 );
 
 // ===============================================================
-
 const addsInsertIntoDB = catchAsync(async (req: Request, res: Response) => {
   const result = await DashboardService.addsInsertIntoDB(req.files, req.body);
   sendResponse<IAdds>(res, {
@@ -157,6 +154,7 @@ const allAdds = catchAsync(async (req: Request, res: Response) => {
     data: result.data,
   });
 });
+
 // ===========================
 const addFaq = catchAsync(async (req: Request, res: Response) => {
   const result = await DashboardService.addFaq(req.body);
@@ -167,6 +165,7 @@ const addFaq = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const updateFaq = catchAsync(async (req: Request, res: Response) => {
   const result = await DashboardService.updateFaq(req);
   sendResponse(res, {
@@ -176,6 +175,7 @@ const updateFaq = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const deleteFaq = catchAsync(async (req: Request, res: Response) => {
   const result = await DashboardService.deleteFaq(req);
   sendResponse(res, {
@@ -185,6 +185,7 @@ const deleteFaq = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const getFaq = catchAsync(async (req: Request, res: Response) => {
   const result = await DashboardService.getFaq();
   sendResponse(res, {
@@ -204,6 +205,7 @@ const addTermsConditions = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const getTermsConditions = catchAsync(async (req: Request, res: Response) => {
   const result = await DashboardService.getTermsConditions();
   sendResponse(res, {
@@ -213,6 +215,7 @@ const getTermsConditions = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const addPrivacyPolicy = catchAsync(async (req: Request, res: Response) => {
   const result = await DashboardService.addPrivacyPolicy(req.body);
   sendResponse(res, {
@@ -222,6 +225,7 @@ const addPrivacyPolicy = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 const getPrivacyPolicy = catchAsync(async (req: Request, res: Response) => {
   const result = await DashboardService.getPrivacyPolicy();
   sendResponse(res, {
@@ -232,7 +236,6 @@ const getPrivacyPolicy = catchAsync(async (req: Request, res: Response) => {
   });
 });
 // ================================
-
 
 export const DashboardController = {
   getAllUser,

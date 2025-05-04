@@ -1,28 +1,42 @@
 import mongoose, { Document } from "mongoose";
 
-export type IUser = Document & {
-  authId: mongoose.Schema.Types.ObjectId;
+export interface IUser extends Document {
+  authId: mongoose.Types.ObjectId;
   name: string;
   email: string;
   profile_image?: string | null;
   phone_number?: string | null;
   isPhoneNumberVerified: boolean;
-  street?: string | null;
-  neighborhood?: string | null;
-  city?: string | null;
-  state?: string | null;
-  country?: string | null;
-  date_of_birth?: Date;
-  amount: number;
+  nid_No?: string | null;
+  gender?: string | null;
+  present_address?: string | null;
+  permanent_address?: string;
+  details?: string;
+  educational_info?: IEducational[];
+  work_experience?: IWorkExperience[];
+  skill?: string[];
+  curricular_activities?: string[];
+  hobbies?: string[];
   status: "active" | "deactivate";
   createdAt?: Date;
   updatedAt?: Date;
-  mail_types: string[];
-  relevant_dielary: string[];
-  age: string;
-  weight: string;
-  hight: string;
-  activety_lavel: string;
-  duration_time: Date;
-  subscription_status: string;
+}
+
+export interface IEducational {
+  level_of_education: string;
+  exam_title: string;
+  institution: string;
+  result: string;
+  result_type: string;
+  start_year: string;
+  passing_year: string;
+}
+
+export interface IWorkExperience {
+  job_title: string;
+  company_name: string;
+  location: string;
+  from_date: string;
+  start_date: string;
+  details: string;
 }

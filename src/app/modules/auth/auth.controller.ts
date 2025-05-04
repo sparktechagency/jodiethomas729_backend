@@ -149,6 +149,16 @@ const blockUnblockAuthUser = catchAsync(async (req, res) => {
   });
 });
 
+const myProfile = catchAsync(async (req: Request, res: Response) => {
+  const result = await AuthService.myProfile(req.user as IReqUser);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "User retrieved successfully",
+    data: result,
+  });
+});
+
 export const AuthController = {
   registrationAccount,
   activateAccount,
@@ -161,5 +171,6 @@ export const AuthController = {
   resendCodeActivationAccount,
   resendCodeForgotAccount,
   deleteMyAccount,
-  blockUnblockAuthUser
+  blockUnblockAuthUser,
+  myProfile
 };

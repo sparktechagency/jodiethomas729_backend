@@ -1,6 +1,63 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
-import { IUser } from "./user.interface";
-import { ENUM_MEAL_TYPE } from "../../../enums/user";
+import { IEducational, IUser, IWorkExperience } from "./user.interface";
+
+const EducationalSchema = new Schema<IEducational>({
+  level_of_education: {
+    type: String,
+    required: true,
+  },
+  exam_title: {
+    type: String,
+    required: true,
+  },
+  institution: {
+    type: String,
+    required: true,
+  },
+  result: {
+    type: String,
+    required: true,
+  },
+  result_type: {
+    type: String,
+    required: true,
+  },
+  start_year: {
+    type: String,
+    required: true,
+  },
+  passing_year: {
+    type: String,
+    required: true,
+  },
+})
+
+const WorkExSchema = new Schema<IWorkExperience>({
+  job_title: {
+    type: String,
+    required: true,
+  },
+  company_name: {
+    type: String,
+    required: true,
+  },
+  location: {
+    type: String,
+    required: true,
+  },
+  from_date: {
+    type: String,
+    required: true,
+  },
+  start_date: {
+    type: String,
+    required: true,
+  },
+  details: {
+    type: String,
+    required: true,
+  },
+})
 
 const UserSchema = new Schema<IUser>(
   {
@@ -29,41 +86,39 @@ const UserSchema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
-    street: {
+    nid_No: {
       type: String,
       default: null,
     },
-    neighborhood: {
+    gender: {
       type: String,
       default: null,
     },
-    age: {
+    present_address: {
       type: String,
       default: null,
     },
-    weight: {
+    permanent_address: {
       type: String,
     },
-    hight: {
+    details: {
       type: String,
     },
-    activety_lavel: {
-      type: String,
+    educational_info: {
+      type: [EducationalSchema],
     },
-    date_of_birth: {
-      type: Date,
+    work_experience: {
+      type: [WorkExSchema]
     },
-    amount: {
-      type: Number,
+    skill: {
+      type: [String],
+    },
+    curricular_activities: {
+      type: [String],
       default: 0,
     },
-    duration_time: {
-      type: Date,
-    },
-    subscription_status: {
-      type: String,
-      enum: ["Active", "None", "Expired"],
-      default: "None",
+    hobbies: {
+      type: [String],
     },
     status: {
       type: String,

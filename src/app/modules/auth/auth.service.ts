@@ -21,11 +21,10 @@ import Employer from "../employer/employer.model";
 const registrationAccount = async (payload: IAuth) => {
   const { role, password, confirmPassword, email, ...other } = payload;
 
-
   if (!role || !Object.values(ENUM_USER_ROLE).includes(role as any)) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Valid Role is required!");
   }
-  console.log("========", role)
+
   if (!password || !confirmPassword || !email) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Email, Password, and Confirm Password are required!");
   }
@@ -586,6 +585,30 @@ const blockUnblockAuthUser = async (payload: {
   }
 };
 
+const myProfile = async (user: { userId: string, role: string }) => {
+  const { userId, role } = user;
+  let result;
+  switch (role) {
+    case ENUM_USER_ROLE.USER:
+      result = await User.findById(userId).populate("authId");
+      break;
+    case ENUM_USER_ROLE.ADMIN:
+      result = await Admin.findById(userId).populate("authId");
+      break;
+    case ENUM_USER_ROLE.EMPLOYER:
+      result = await Employer.findById(userId).populate("authId");
+      break;
+    default:
+      throw new ApiError(400, "Invalid role provided!");
+  }
+
+  console.log("===========", result)
+
+
+  return result;
+};
+
+
 
 export const AuthService = {
   registrationAccount,
@@ -598,6 +621,8 @@ export const AuthService = {
   resendCodeActivationAccount,
   resendCodeForgotAccount,
   deleteMyAccount,
-  blockUnblockAuthUser
+  blockUnblockAuthUser,
+  myProfile
+
 };
 

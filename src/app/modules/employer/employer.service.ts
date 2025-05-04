@@ -9,8 +9,7 @@ import Employer from "./employer.model";
 const updateMyProfile = async (req: RequestData): Promise<IEmployer> => {
   const { files, body: data } = req;
   const { userId, authId } = req.user;
-
-  if (!Object.keys(data as any).length) {
+  if (!Object.keys(data as IEmployer).length) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
       "Data is missing in the request body!"
@@ -33,8 +32,14 @@ const updateMyProfile = async (req: RequestData): Promise<IEmployer> => {
     profile_image = `/images/profile/${files.profile_image[0].filename}`;
   }
 
-  const updatedData = { ...data };
+  if (data?.company) {
+    data.company = JSON.parse(data?.company);
+  }
+  if (data?.socialMedia) {
+    data.socialMedia = JSON.parse(data?.socialMedia);
+  }
 
+  const updatedData = { ...data };
   const [, updateEmployer] = await Promise.all([
     Auth.findByIdAndUpdate(
       authId,

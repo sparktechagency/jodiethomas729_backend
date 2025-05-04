@@ -4,7 +4,6 @@ import config from '../../../config';
 import validator from 'validator';
 import { IAuth, IAuthModel } from './auth.interface';
 
-
 const AuthSchema: Schema<IAuth> = new Schema(
   {
     name: {
@@ -17,12 +16,12 @@ const AuthSchema: Schema<IAuth> = new Schema(
       unique: true,
       validate: {
         validator: (value: string) => validator.isEmail(value),
-        message: "Please provide a valid email address",
+        message: "Please provide a valid email address.",
       },
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
+      required: [true, "Password is required."],
       select: false,
     },
     role: {

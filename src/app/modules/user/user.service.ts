@@ -55,21 +55,6 @@ const updateMyProfile = async (req: RequestData): Promise<IUser> => {
   return updateUser as IUser;
 };
 
-const getProfile = async (user: { userId: string }): Promise<IUser> => {
-  const { userId } = user;
-  const result = await User.findById(userId).populate("authId");
-  if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
-  }
-
-  const auth = await Auth.findById(result.authId);
-  if (auth?.is_block) {
-    throw new ApiError(httpStatus.FORBIDDEN, "You are blocked. Contact support");
-  }
-
-  return result;
-};
-
 const deleteUSerAccount = async (payload: { email: string; password: string; }): Promise<void> => {
   const { email, password } = payload;
 
@@ -90,7 +75,6 @@ const deleteUSerAccount = async (payload: { email: string; password: string; }):
 };
 
 export const UserService = {
-  getProfile,
   deleteUSerAccount,
   updateMyProfile,
 };
