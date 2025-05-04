@@ -1,15 +1,5 @@
 import mongoose, { Document, Model } from "mongoose";
-
-interface IAdmin extends Document {
-  authId: mongoose.Types.ObjectId;
-  name: string;
-  email: string;
-  profile_image?: string | null;
-  phone_number: string;
-  address?: string | null;
-  location?: string | null;
-  date_of_birth?: string | null;
-}
+import { IAdmin } from "./admin.interface";
 
 const AdminSchema = new mongoose.Schema<IAdmin>(
   {
@@ -30,19 +20,15 @@ const AdminSchema = new mongoose.Schema<IAdmin>(
       type: String,
       default: null,
     },
-    phone_number: {
+    company_name: {
       type: String,
-      required: true,
+      default: null,
+    },
+    contact: {
+      type: String,
+      default: null,
     },
     address: {
-      type: String,
-      default: null,
-    },
-    location: {
-      type: String,
-      default: null,
-    },
-    date_of_birth: {
       type: String,
       default: null,
     },

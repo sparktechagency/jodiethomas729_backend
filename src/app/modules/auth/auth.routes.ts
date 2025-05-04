@@ -48,7 +48,7 @@ router.patch(
 
 //------ Admin Router --------------- 
 router.patch(
-  "/edit-profile",
+  "/admin/edit-profile",
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   uploadFile(),
   AdminController.updateProfile
@@ -57,6 +57,18 @@ router.delete(
   "/delete-account",
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   AdminController.deleteMyAccount
+);
+
+router.delete(
+  "/delete-auth-account",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  AdminController.deleteAuthAccount
+);
+
+router.get(
+  "/get_all_admin",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  AdminController.getAllAdmin
 );
 
 export const AuthRoutes = router;

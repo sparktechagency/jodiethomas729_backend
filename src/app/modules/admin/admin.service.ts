@@ -4,6 +4,10 @@ import Auth from "../auth/auth.model";
 import { Request } from "express";
 import { IAdmin } from "./admin.interface";
 import Admin from "./admin.model";
+import { IReqUser } from "../auth/auth.interface";
+import { ENUM_USER_ROLE } from "../../../enums/user";
+import User from "../user/user.model";
+import Employer from "../employer/employer.model";
 
 interface IRequest extends Request {
   user: {
@@ -35,16 +39,9 @@ const updateProfile = async (req: IRequest): Promise<IAdmin | null> => {
   if (files?.profile_image) {
     profile_image = `/images/profile/${files.profile_image[0].filename}`;
   }
-
-  let cover_image: string | undefined;
-  if (files?.cover_image) {
-    cover_image = `/images/cover/${files.cover_image[0].filename}`;
-  }
-
   const updatedData = {
     ...data,
     ...(profile_image && { profile_image }),
-    ...(cover_image && { cover_image }),
   };
 
   await Auth.findOneAndUpdate(
@@ -79,9 +76,50 @@ const deleteMyAccount = async (payload: { email: string; password: string }): Pr
   await Auth.deleteOne({ email });
 };
 
+const getAllAdmin = async () => {
+  const admins = await Admin.find().lean();
+  return admins.map((admin) => ({
+    ...admin,
+    role: "Admin",
+  }));
+};
+
+const deleteAuthAccount = async (user: IReqUser, email: string) => {
+  const { authId } = user;
+
+  const isUserExist = await Auth.findOne({ email }) as any;
+  if (!isUserExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User does not exist");
+  }
+
+  if (isUserExist?._id.toString() === authId.toString()) {
+    throw new ApiError(httpStatus.FORBIDDEN, "You can't delete your own account!");
+  }
+
+  let result;
+  switch (isUserExist?.role) {
+    case ENUM_USER_ROLE.USER:
+      result = await User.deleteOne({ email });
+      break;
+    case ENUM_USER_ROLE.ADMIN:
+      result = await Admin.deleteOne({ email });
+      break;
+    case ENUM_USER_ROLE.EMPLOYER:
+      result = await Employer.deleteOne({ email });
+      break;
+    default:
+      throw new ApiError(httpStatus.NOT_FOUND, "User role not found!");
+  }
+  await Auth.deleteOne({ email });
+
+  return { message: "Successfully deleted account." };
+};
+
 export const AdminService = {
   updateProfile,
   deleteMyAccount,
+  getAllAdmin,
+  deleteAuthAccount
 };
 
 

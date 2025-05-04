@@ -86,7 +86,7 @@ const UserSchema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
-    nid_No: {
+    nid_no: {
       type: String,
       default: null,
     },
@@ -125,10 +125,9 @@ const UserSchema = new Schema<IUser>(
       enum: ["active", "deactivate"],
       default: "active",
     },
-  },
-  {
-    timestamps: true,
-  }
+  }, {
+  timestamps: true,
+}
 );
 
 const User: Model<IUser> = mongoose.model<IUser>("User", UserSchema);

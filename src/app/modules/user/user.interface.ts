@@ -7,7 +7,7 @@ export interface IUser extends Document {
   profile_image?: string | null;
   phone_number?: string | null;
   isPhoneNumberVerified: boolean;
-  nid_No?: string | null;
+  nid_no?: string | null;
   gender?: string | null;
   present_address?: string | null;
   permanent_address?: string;

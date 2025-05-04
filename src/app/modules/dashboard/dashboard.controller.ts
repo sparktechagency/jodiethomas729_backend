@@ -156,46 +156,6 @@ const allAdds = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ===========================
-const addFaq = catchAsync(async (req: Request, res: Response) => {
-  const result = await DashboardService.addFaq(req.body);
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Successfully create!',
-    data: result,
-  });
-});
-
-const updateFaq = catchAsync(async (req: Request, res: Response) => {
-  const result = await DashboardService.updateFaq(req);
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Successfully Update!',
-    data: result,
-  });
-});
-
-const deleteFaq = catchAsync(async (req: Request, res: Response) => {
-  const result = await DashboardService.deleteFaq(req);
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Successfully Delete!',
-    data: result,
-  });
-});
-
-const getFaq = catchAsync(async (req: Request, res: Response) => {
-  const result = await DashboardService.getFaq();
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: 'Successfully get!',
-    data: result,
-  });
-});
-
 const addTermsConditions = catchAsync(async (req: Request, res: Response) => {
   const result = await DashboardService.addTermsConditions(req.body);
   sendResponse(res, {
@@ -236,6 +196,25 @@ const getPrivacyPolicy = catchAsync(async (req: Request, res: Response) => {
   });
 });
 // ================================
+const addAboutUs = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.addAboutUs(req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successful',
+    data: result,
+  });
+});
+
+const getAboutUs = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.getAboutUs();
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successful',
+    data: result,
+  });
+});
 
 export const DashboardController = {
   getAllUser,
@@ -247,10 +226,6 @@ export const DashboardController = {
   updateAdds,
   deleteAdds,
   allAdds,
-  getFaq,
-  deleteFaq,
-  updateFaq,
-  addFaq,
   addTermsConditions,
   getTermsConditions,
   addPrivacyPolicy,
@@ -258,6 +233,6 @@ export const DashboardController = {
   totalCount,
   getMonthlySubscriptionGrowth,
   getMonthlyUserGrowth,
-
-
+  addAboutUs,
+  getAboutUs
 };

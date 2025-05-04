@@ -41,6 +41,7 @@ router.get('/get_all_subscriptions',
   DashboardController.getAllSubscription,
 );
 // ========================================= 
+
 // =========================================
 router.post('/create-adds',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
@@ -63,30 +64,35 @@ router.delete(
   DashboardController.deleteAdds,
 );
 // ========================
-router.post('/add-faqs',
-  DashboardController.addFaq,
-);
-router.patch('/update-faqs/:id',
-  DashboardController.updateFaq,
-);
-router.delete('/delete-faqs/:id',
-  DashboardController.deleteFaq,
-);
-router.get('/get-faqs',
-  DashboardController.getFaq,
-);
+// router.post('/add-faqs',
+//   DashboardController.addFaq,
+// );
+// router.patch('/update-faqs/:id',
+//   DashboardController.updateFaq,
+// );
+// router.delete('/delete-faqs/:id',
+//   DashboardController.deleteFaq,
+// );
+// router.get('/get-faqs',
+//   DashboardController.getFaq,
+// );
 router.post('/addupdate-termsConditions',
   DashboardController.addTermsConditions,
 );
 router.get('/get-rules',
   DashboardController.getTermsConditions,
 );
-
 router.post('/addupdate-privacy-policy',
   DashboardController.addPrivacyPolicy,
 );
 router.get('/get-privacy-policy',
   DashboardController.getPrivacyPolicy,
+);
+router.post('/about_us',
+  DashboardController.addAboutUs,
+);
+router.get('/about_us',
+  DashboardController.getAboutUs,
 );
 // ================================ 
 

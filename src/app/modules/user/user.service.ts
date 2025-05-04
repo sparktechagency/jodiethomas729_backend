@@ -33,6 +33,22 @@ const updateMyProfile = async (req: RequestData): Promise<IUser> => {
     profile_image = `/images/profile/${files.profile_image[0].filename}`;
   }
 
+  if (data?.educational_info) {
+    data.educational_info = JSON.parse(data?.educational_info);
+  }
+  if (data?.work_experience) {
+    data.work_experience = JSON.parse(data?.work_experience);
+  }
+  if (data?.skill) {
+    data.skill = JSON.parse(data?.skill);
+  }
+  if (data?.curricular_activities) {
+    data.curricular_activities = JSON.parse(data?.curricular_activities);
+  }
+  if (data?.hobbies) {
+    data.hobbies = JSON.parse(data?.hobbies);
+  }
+
   const updatedData = { ...data };
 
   const [, updateUser] = await Promise.all([

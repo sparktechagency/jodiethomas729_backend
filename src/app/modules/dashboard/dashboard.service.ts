@@ -1,11 +1,8 @@
-import { Types } from "mongoose";
 import QueryBuilder from "../../../builder/QueryBuilder";
 import ApiError from "../../../errors/ApiError";
-import { IReqUser } from "../auth/auth.interface";
 import User from "../user/user.model";
-import { Adds, Faq, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
-import { IAdds, IContactSupport, IRecipe, ISubscriptions } from "./dsashbaord.interface";
-import { IUser } from "../user/user.interface";
+import { AboutUs, Adds, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
+import { IAdds, ISubscriptions } from "./dsashbaord.interface";
 import { logger } from "../../../shared/logger";
 import { Transaction } from "../payment/payment.model";
 
@@ -312,35 +309,6 @@ const deleteAdds = async (id: string) => {
     return await Adds.findByIdAndDelete(id);
 };
 
-//! Faqs
-const addFaq = async (payload: any) => {
-
-    if (!payload?.questions || !payload?.answer) {
-        throw new Error("Question and answer are required");
-    }
-
-    return await Faq.create(payload);
-};
-
-const updateFaq = async (req: any) => {
-    const id = req.params.id
-
-    const payload = req.body
-    if (!payload?.questions || !payload?.answer) {
-        throw new Error("Question and answer are required");
-    }
-
-    const result = await Faq.findByIdAndUpdate(id, payload, { new: true });
-
-    return result
-};
-const deleteFaq = async (req: any) => {
-    const id = req.params.id
-    return await Faq.findByIdAndDelete(id);
-};
-const getFaq = async () => {
-    return await Faq.find();
-};
 // ==============
 const addTermsConditions = async (payload: any) => {
     const checkIsExist = await TermsConditions.findOne();
@@ -354,6 +322,7 @@ const addTermsConditions = async (payload: any) => {
         return await TermsConditions.create(payload);
     }
 };
+
 const getTermsConditions = async () => {
     return await TermsConditions.findOne();
 };
@@ -375,18 +344,22 @@ const getPrivacyPolicy = async () => {
     return await PrivacyPolicy.findOne();
 };
 
+const addAboutUs = async (payload: any) => {
+    const checkIsExist = await AboutUs.findOne();
+    if (checkIsExist) {
+        return await AboutUs.findOneAndUpdate({}, payload, {
+            new: true,
 
-// getAllRecipes,
-// createRecipes,
-// updateRecipes,
-// deleteRecipe,
-// getMyRecipes,
-// getRecipeDetails,
-// getRecipesForYou,
-// sendMessageSupport,
-// getAllMessagesSupport,
-// toggleFavorite,
-// getUserFavorites
+            runValidators: true,
+        });
+    } else {
+        return await AboutUs.create(payload);
+    }
+};
+
+const getAboutUs = async () => {
+    return await AboutUs.findOne();
+};
 
 export const DashboardService = {
     totalCount,
@@ -397,15 +370,13 @@ export const DashboardService = {
     allAdds,
     updateAdds,
     deleteAdds,
-    addFaq,
-    updateFaq,
-    deleteFaq,
-    getFaq,
     addTermsConditions,
     getTermsConditions,
     addPrivacyPolicy,
     getPrivacyPolicy,
     getMonthlySubscriptionGrowth,
     getMonthlyUserGrowth,
-    deleteSubscription
+    deleteSubscription,
+    getAboutUs,
+    addAboutUs
 };
