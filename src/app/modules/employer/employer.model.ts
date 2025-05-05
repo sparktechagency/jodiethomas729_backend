@@ -32,6 +32,9 @@ const EmployerSchema = new Schema<IEmployer>({
     enum: ["Active", "None", "Expired"],
     default: "None",
   },
+  duration_time: {
+    type: Date,
+  },
   status: {
     type: String,
     enum: ["active", "deactivate"],

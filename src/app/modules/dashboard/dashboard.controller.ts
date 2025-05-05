@@ -2,7 +2,7 @@ import { Request, RequestHandler, Response } from 'express';
 import sendResponse from '../../../shared/sendResponse';
 import catchAsync from '../../../shared/catchasync';
 import { DashboardService } from './dashboard.service';
-import { IAdds, ISubscriptions } from './dsashbaord.interface';
+import { ICategory, ISubscriptions } from './dsashbaord.interface';
 import { Subscription } from './dashboard.model';
 import { IReqUser } from '../auth/auth.interface';
 
@@ -113,44 +113,56 @@ const getAllSubscription: RequestHandler = catchAsync(
   },
 );
 
+const getAllSubscriber: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const query = req.query;
+    const result = await DashboardService.getAllSubscriber(query);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: `Get successfully`,
+      data: result,
+    });
+  },
+);
+
 // ===============================================================
-const addsInsertIntoDB = catchAsync(async (req: Request, res: Response) => {
-  const result = await DashboardService.addsInsertIntoDB(req.files, req.body);
-  sendResponse<IAdds>(res, {
+const categoryInsertIntoDB = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.categoryInsertIntoDB(req.files, req.body);
+  sendResponse<ICategory>(res, {
     statusCode: 200,
     success: true,
-    message: 'Adds create successfully',
+    message: 'Category create successfully',
     data: result,
   });
 });
 
-const updateAdds = catchAsync(async (req: Request, res: Response) => {
-  const result = await DashboardService.updateAdds(req);
-  sendResponse<IAdds>(res, {
+const updateCategory = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.updateCategory(req);
+  sendResponse<ICategory>(res, {
     statusCode: 200,
     success: true,
-    message: 'Adds update successfully',
+    message: 'Category update successfully',
     data: result,
   });
 });
 
-const deleteAdds = catchAsync(async (req: Request, res: Response) => {
-  const result = await DashboardService.deleteAdds(req.params.id);
-  sendResponse<IAdds>(res, {
+const deleteCategory = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.deleteCategory(req.params.id);
+  sendResponse<ICategory>(res, {
     statusCode: 200,
     success: true,
-    message: 'Adds delete successfully',
+    message: 'Category delete successfully',
     data: result,
   });
 });
 
-const allAdds = catchAsync(async (req: Request, res: Response) => {
-  const result = await DashboardService.allAdds(req.query);
-  sendResponse<IAdds[]>(res, {
+const allCategory = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.allCategory(req.query);
+  sendResponse<ICategory[]>(res, {
     statusCode: 200,
     success: true,
-    message: 'Adds Retrieved successfully',
-    meta: result.meta,
+    message: 'Category Retrieved successfully',
     data: result.data,
   });
 });
@@ -195,6 +207,7 @@ const getPrivacyPolicy = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
 // ================================
 const addAboutUs = catchAsync(async (req: Request, res: Response) => {
   const result = await DashboardService.addAboutUs(req.body);
@@ -222,10 +235,10 @@ export const DashboardController = {
   updateSubscription,
   deleteSubscription,
   getAllSubscription,
-  addsInsertIntoDB,
-  updateAdds,
-  deleteAdds,
-  allAdds,
+  categoryInsertIntoDB,
+  updateCategory,
+  deleteCategory,
+  allCategory,
   addTermsConditions,
   getTermsConditions,
   addPrivacyPolicy,
@@ -234,5 +247,6 @@ export const DashboardController = {
   getMonthlySubscriptionGrowth,
   getMonthlyUserGrowth,
   addAboutUs,
-  getAboutUs
+  getAboutUs,
+  getAllSubscriber
 };

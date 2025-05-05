@@ -1,7 +1,6 @@
 import mongoose, { Schema, Types } from "mongoose";
 import { ITransaction } from "./payment.interface";
 
-
 const transactionSchema = new Schema<ITransaction>({
     subscriptionId: {
         type: Types.ObjectId,

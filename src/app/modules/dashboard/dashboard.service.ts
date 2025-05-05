@@ -1,10 +1,11 @@
 import QueryBuilder from "../../../builder/QueryBuilder";
 import ApiError from "../../../errors/ApiError";
 import User from "../user/user.model";
-import { AboutUs, Adds, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
-import { IAdds, ISubscriptions } from "./dsashbaord.interface";
+import { AboutUs, Category, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
+import { ICategory, ISubscriptions } from "./dsashbaord.interface";
 import { logger } from "../../../shared/logger";
 import { Transaction } from "../payment/payment.model";
+import Employer from "../employer/employer.model";
 
 // ===========================================
 const getYearRange = (year: any) => {
@@ -210,6 +211,13 @@ const getAllUser = async (query: any) => {
 // =Subscriptions =================================
 const createSubscriptions = async (payload: ISubscriptions) => {
     try {
+        if (payload?.validation === "Monthly") {
+            payload.duration = 30 // days
+        } else if (payload?.validation === "Yearly") {
+            payload.duration = 365 // days
+        } else {
+            throw new ApiError(404, "Invalids 'validation' types. should - Monthly / Yearly")
+        }
         const subscription = new Subscription(payload);
         await subscription.save();
         return subscription;
@@ -243,8 +251,32 @@ const deleteSubscription = async (id: string) => {
     }
 };
 
+const getAllSubscriber = async (query: any) => {
+    const cleanQuery = { ...query };
+
+    if (cleanQuery?.searchTerm) {
+        delete cleanQuery.page;
+    }
+
+    const userQuery = new QueryBuilder(
+        Employer.find({ subscription_status: { $in: ["Active", "Expired"] } }),
+        cleanQuery
+    )
+        .search(["name", "email"])
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await userQuery.modelQuery;
+    const meta = await userQuery.countTotal();
+
+    return { result, meta };
+};
+
+
 // ===================================
-const addsInsertIntoDB = async (files: any, payload: IAdds) => {
+const categoryInsertIntoDB = async (files: any, payload: ICategory) => {
     if (!files?.image) {
         throw new ApiError(400, 'File is missing');
     }
@@ -253,27 +285,23 @@ const addsInsertIntoDB = async (files: any, payload: IAdds) => {
         payload.image = `/images/image/${files.image[0].filename}`;
     }
 
-    return await Adds.create(payload);
+    return await Category.create(payload);
 };
 
-const allAdds = async (query: Record<string, unknown>) => {
-    const addsQuery = new QueryBuilder(Adds.find(), query)
-        .search([])
+const allCategory = async (query: Record<string, unknown>) => {
+    const categoryQuery = new QueryBuilder(Category.find(), query)
+        .search(['category'])
         .filter()
-        .sort()
-        .paginate()
         .fields();
 
-    const result = await addsQuery.modelQuery;
-    const meta = await addsQuery.countTotal();
+    const result = await categoryQuery.modelQuery;
 
     return {
-        meta,
         data: result,
     };
 };
 
-const updateAdds = async (req: any) => {
+const updateCategory = async (req: any) => {
     const { files } = req as any;
     const id = req.params.id;
     const { ...AddsData } = req.body;
@@ -284,13 +312,13 @@ const updateAdds = async (req: any) => {
         AddsData.image = `/images/image/${files.image[0].filename}`;
     }
 
-    const isExist = await Adds.findOne({ _id: id });
+    const isExist = await Category.findOne({ _id: id });
 
     if (!isExist) {
         throw new ApiError(404, 'Adds not found !');
     }
 
-    const result = await Adds.findOneAndUpdate(
+    const result = await Category.findOneAndUpdate(
         { _id: id },
         { ...AddsData },
         {
@@ -301,12 +329,12 @@ const updateAdds = async (req: any) => {
     return result;
 };
 
-const deleteAdds = async (id: string) => {
-    const isExist = await Adds.findOne({ _id: id });
+const deleteCategory = async (id: string) => {
+    const isExist = await Category.findOne({ _id: id });
     if (!isExist) {
-        throw new ApiError(404, 'Adds not found !');
+        throw new ApiError(404, 'Category not found !');
     }
-    return await Adds.findByIdAndDelete(id);
+    return await Category.findByIdAndDelete(id);
 };
 
 // ==============
@@ -366,10 +394,10 @@ export const DashboardService = {
     getAllUser,
     createSubscriptions,
     updateSubscription,
-    addsInsertIntoDB,
-    allAdds,
-    updateAdds,
-    deleteAdds,
+    categoryInsertIntoDB,
+    allCategory,
+    updateCategory,
+    deleteCategory,
     addTermsConditions,
     getTermsConditions,
     addPrivacyPolicy,
@@ -378,5 +406,6 @@ export const DashboardService = {
     getMonthlyUserGrowth,
     deleteSubscription,
     getAboutUs,
-    addAboutUs
+    addAboutUs,
+    getAllSubscriber
 };

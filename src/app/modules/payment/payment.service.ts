@@ -10,6 +10,9 @@ import { Transaction } from "./payment.model";
 import cron from "node-cron";
 import { logger } from "../../../shared/logger";
 import QueryBuilder from "../../../builder/QueryBuilder";
+import { ENUM_USER_ROLE } from "../../../enums/user";
+import Employer from "../employer/employer.model";
+import { IEmployer } from "../employer/employer.interface";
 
 const stripe = require("stripe")(config.stripe.stripe_secret_key);
 const DOMAIN_URL = process.env.SERVER_PASS_UI_LINK;
@@ -44,7 +47,16 @@ const createCheckoutSessionStripe = async (req: any) => {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Missing required fields.');
         }
 
-        const user = await User.findById(userId) as IUser;
+        let user
+        if (role === ENUM_USER_ROLE.USER) {
+            user = await User.findById(userId) as IUser;
+        } else if (role === ENUM_USER_ROLE.EMPLOYER) {
+            user = await Employer.findById(userId) as IEmployer;
+        } else {
+            throw new ApiError(httpStatus.BAD_REQUEST, 'You can not access for payment.')
+        }
+
+
         if (!user) {
             throw new ApiError(httpStatus.NOT_FOUND, 'User not found.');
         }
@@ -54,7 +66,7 @@ const createCheckoutSessionStripe = async (req: any) => {
             throw new ApiError(httpStatus.NOT_FOUND, 'invalid subscription ID.');
         }
 
-        const unitAmount = Number(subscription.fee) * 100;
+        const unitAmount = Number(subscription.price) * 100;
 
         let session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -66,6 +78,7 @@ const createCheckoutSessionStripe = async (req: any) => {
             metadata: {
                 payUser: userId,
                 subscriptionId: subscriptionId,
+                role: role
             },
             line_items: [
                 {
@@ -74,7 +87,7 @@ const createCheckoutSessionStripe = async (req: any) => {
                         unit_amount: unitAmount,
                         product_data: {
                             name: subscription.name,
-                            description: subscription?.description
+                            description: subscription?.validation
                         }
                     },
                     quantity: 1
@@ -107,15 +120,17 @@ const stripeCheckAndUpdateStatusSuccess = async (req: any) => {
             return { status: "failed", message: "Payment not approved." };
         }
 
-        const { payUser, subscriptionId } = session.metadata;
+        const { payUser, subscriptionId, role } = session.metadata;
 
         const subscription = await Subscription.findById(subscriptionId) as ISubscriptions;
         if (!subscription) {
-            return {
-                status: "failed",
-                message: "Subscription not found!",
-                text: 'Payment succeeded, but the subscription could not be found. Please contact support.'
-            };
+            // Notifications
+
+            // return {
+            //     status: "failed",
+            //     message: "Subscription not found!",
+            //     text: 'Payment succeeded, but the subscription could not be found. Please contact support.'
+            // };
         }
 
         const amount = Number(session.amount_total) / 100;
@@ -125,6 +140,7 @@ const stripeCheckAndUpdateStatusSuccess = async (req: any) => {
             userId: payUser,
             amount: amount,
             paymentStatus: "Completed",
+            userEmail: session.customer_email,
             transactionId: session.payment_intent,
             paymentDetails: {
                 email: session.customer_email,
@@ -134,14 +150,23 @@ const stripeCheckAndUpdateStatusSuccess = async (req: any) => {
         };
         const newTransaction = await Transaction.create(transactionData);
 
-        let user = await User.findById(payUser) as any;
+        let user
+        if (role === ENUM_USER_ROLE.USER) {
+            user = await User.findById(payUser) as IUser;
+        } else if (role === ENUM_USER_ROLE.EMPLOYER) {
+            user = await Employer.findById(payUser) as IEmployer;
+        } else {
+            throw new ApiError(httpStatus.BAD_REQUEST, 'Some thing was wrong.')
+        }
+
+        // let user = await User.findById(payUser) as any; 
         const expiryDate = new Date();
 
-        if (subscription.duration === "Monthly") {
+        if (subscription.validation === "Monthly") {
             expiryDate.setMonth(expiryDate.getMonth() + 1);
             user.duration_time = expiryDate;
             user.subscription_status = "Active";
-        } else if (subscription.duration === "Yearly") {
+        } else if (subscription.validation === "Yearly") {
             expiryDate.setFullYear(expiryDate.getFullYear() + 1);
             user.duration_time = expiryDate;
             user.subscription_status = "Active";
@@ -150,6 +175,8 @@ const stripeCheckAndUpdateStatusSuccess = async (req: any) => {
         }
 
         await user.save();
+
+        // Notifications
 
         return { status: "success", result: newTransaction };
 
@@ -166,7 +193,7 @@ const getAllTransactions = async (query: any) => {
     if (query?.searchTerm) {
         delete query.page;
     }
-    const transationQuery = new QueryBuilder(Transaction.find()
+    const transitionQuery = new QueryBuilder(Transaction.find()
         .populate({
             path: "userId",
             select: "name email profile_image",
@@ -182,8 +209,8 @@ const getAllTransactions = async (query: any) => {
         .paginate()
         .fields()
 
-    const result = await transationQuery.modelQuery;
-    const meta = await transationQuery.countTotal();
+    const result = await transitionQuery.modelQuery;
+    const meta = await transitionQuery.countTotal();
     // console.log(result)
     return { result, meta };
 

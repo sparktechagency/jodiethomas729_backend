@@ -2,9 +2,11 @@ import { Schema, Types } from "mongoose";
 
 export type ISubscriptions = {
   name: string;
-  duration: string;
-  fee: Number;
-  description: string
+  duration: number;
+  validation: string;
+  price: number;
+  conditions: string[];
+  notice: string;
 };
 
 export interface INutritional {
@@ -60,9 +62,9 @@ export interface IComment extends Document {
   text: string;
 }
 
-export type IAdds = {
+export type ICategory = {
   image: string;
-  url: string;
+  category: string;
 };
 
 export type IContactSupport = {

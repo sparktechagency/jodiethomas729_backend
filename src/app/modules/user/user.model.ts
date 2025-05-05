@@ -120,6 +120,14 @@ const UserSchema = new Schema<IUser>(
     hobbies: {
       type: [String],
     },
+    duration_time: {
+      type: Date,
+    },
+    subscription_status: {
+      type: String,
+      enum: ["Active", "None", "Expired"],
+      default: "None",
+    },
     status: {
       type: String,
       enum: ["active", "deactivate"],

@@ -40,29 +40,32 @@ router.delete('/delete_subscriptions/:id',
 router.get('/get_all_subscriptions',
   DashboardController.getAllSubscription,
 );
-// ========================================= 
+router.get('/get_all_subscribers',
+  DashboardController.getAllSubscriber,
+);
 
 // =========================================
-router.post('/create-adds',
+router.post('/create-category',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   uploadFile(),
-  DashboardController.addsInsertIntoDB,
+  DashboardController.categoryInsertIntoDB,
 );
 router.get(
-  '/all-adds',
-  DashboardController.allAdds,
+  '/all-category',
+  DashboardController.allCategory,
 );
 router.patch(
-  '/edit-adds/:id',
+  '/edit-category/:id',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   uploadFile(),
-  DashboardController.updateAdds,
+  DashboardController.updateCategory,
 );
 router.delete(
-  '/delete-adds/:id',
+  '/delete-category/:id',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  DashboardController.deleteAdds,
+  DashboardController.deleteCategory,
 );
+
 // ========================
 // router.post('/add-faqs',
 //   DashboardController.addFaq,
@@ -94,9 +97,7 @@ router.post('/about_us',
 router.get('/about_us',
   DashboardController.getAboutUs,
 );
-// ================================ 
-
-// ================================
+// ================================  
 
 
 export const DashboardRoutes = router;

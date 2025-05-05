@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema, Types } from "mongoose";
-import { IAdds, IComment, IContactSupport, INutritional, IRecipe, IReview, ISubscriptions } from "./dsashbaord.interface";
+import { ICategory, IComment, IContactSupport, INutritional, IRecipe, IReview, ISubscriptions } from "./dsashbaord.interface";
 import { string } from "zod";
 
 
@@ -9,18 +9,27 @@ const SubscriptionSchema = new Schema<ISubscriptions>({
         required: true
     },
     duration: {
+        type: Number,
+        required: true,
+    },
+    validation: {
         type: String,
         required: true,
         enum: ["Monthly", "Yearly"]
     },
-    fee: {
+    price: {
         type: Number,
         required: true
     },
-    description: {
-        type: String,
+    conditions: {
+        type: [String],
         required: true
+    },
+    notice: {
+        type: String,
     }
+
+
 }, { timestamps: true });
 
 
@@ -58,10 +67,9 @@ const ReviewSchema = new Schema<IReview>({
     },
 });
 
-
-const addsSchema = new Schema<IAdds>(
+const categorySchema = new Schema<ICategory>(
     {
-        url: {
+        category: {
             type: String,
             required: true,
         },
@@ -102,12 +110,12 @@ const aboutUsSchema = new mongoose.Schema(
 const Subscription: Model<ISubscriptions> = mongoose.model<ISubscriptions>('Subscription', SubscriptionSchema);
 const Comment: Model<IComment> = mongoose.model<IComment>('Comment', CommentSchema);
 const Review: Model<IReview> = mongoose.model<IReview>('Review', ReviewSchema);
-const Adds: Model<IAdds> = mongoose.model<IAdds>('Adds', addsSchema);
+const Category: Model<ICategory> = mongoose.model<ICategory>('Category', categorySchema);
 const TermsConditions = mongoose.model('TermsConditions', termsAndConditionsSchema);
 const PrivacyPolicy = mongoose.model('PrivacyPolicy', privacyPolicySchema);
 const AboutUs = mongoose.model('AboutUs', aboutUsSchema);
 
-export { Subscription, Comment, Review, Adds, TermsConditions, PrivacyPolicy, AboutUs };
+export { Subscription, Comment, Review, Category, TermsConditions, PrivacyPolicy, AboutUs };
 
 
 // enum: ["African", "American", "Asian", "Caribbean", "Chinese", "Cuban", "East-African", "Ethiopian", "European", "French", "German", "Greek", "Indian", "Irish", "Israeli", "Italian", "Jamaican", "Japanese", "Korean", "Latin-American", "Mediterranean", "Mexican", "Middle-Eastern", "Moroccan", "North-African", "Persian", "Peruvian", "Puerto-Rican", "Russian", "Spanish", "Tex-Mex", "Thai", "Vietnamese", "West-African"],

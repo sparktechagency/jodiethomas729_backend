@@ -20,6 +20,8 @@ export interface IUser extends Document {
   status: "active" | "deactivate";
   createdAt?: Date;
   updatedAt?: Date;
+  duration_time: Date;
+  subscription_status: string;
 }
 
 export interface IEducational {
