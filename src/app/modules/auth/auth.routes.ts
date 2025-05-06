@@ -6,6 +6,7 @@ import { AdminController } from '../admin/admin.controller';
 import { AuthController } from './auth.controller';
 import { UserController } from '../user/user.controller';
 import { EmployerController } from '../employer/employer.controller';
+import { DashboardController } from '../dashboard/dashboard.controller';
 
 const router = express.Router();
 //------ Auth Route -----------------
@@ -70,5 +71,12 @@ router.get(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   AdminController.getAllAdmin
 );
+
+router.get(
+  "/check_subscriber_status",
+  auth(ENUM_USER_ROLE.EMPLOYER),
+  DashboardController.checkActiveSubscriber
+);
+
 
 export const AuthRoutes = router;

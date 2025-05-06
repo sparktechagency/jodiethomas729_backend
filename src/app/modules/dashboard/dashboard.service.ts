@@ -6,6 +6,8 @@ import { ICategory, ISubscriptions } from "./dsashbaord.interface";
 import { logger } from "../../../shared/logger";
 import { Transaction } from "../payment/payment.model";
 import Employer from "../employer/employer.model";
+import { IReqUser } from "../auth/auth.interface";
+import { ENUM_USER_ROLE } from "../../../enums/user";
 
 // ===========================================
 const getYearRange = (year: any) => {
@@ -207,6 +209,31 @@ const getAllUser = async (query: any) => {
     return { result, meta };
 
 };
+// ===========================================
+const checkActiveSubscriber = async (user: IReqUser) => {
+    try {
+        const { userId, authId, role } = user as IReqUser;
+
+        if (role !== ENUM_USER_ROLE.EMPLOYER) {
+            throw new ApiError(401, `You are not unauthorized for access. Must need role EMPLOYER.`);
+        }
+
+        const employer = await Employer.findById(userId).select("authId name email subscription_status duration_time");
+
+        if (!employer) {
+            throw new ApiError(404, "Employer not found.");
+        }
+
+        const isActive = employer.subscription_status === "Active";
+
+        return {
+            ...employer.toObject(),
+            subscription: isActive
+        };
+    } catch (error: any) {
+        throw new ApiError(400, `Error checking subscription: ${error.message}`);
+    }
+};
 
 // =Subscriptions =================================
 const createSubscriptions = async (payload: ISubscriptions) => {
@@ -273,7 +300,6 @@ const getAllSubscriber = async (query: any) => {
 
     return { result, meta };
 };
-
 
 // ===================================
 const categoryInsertIntoDB = async (files: any, payload: ICategory) => {
@@ -407,5 +433,6 @@ export const DashboardService = {
     deleteSubscription,
     getAboutUs,
     addAboutUs,
-    getAllSubscriber
+    getAllSubscriber,
+    checkActiveSubscriber
 };

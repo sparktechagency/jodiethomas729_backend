@@ -229,6 +229,18 @@ const getAboutUs = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const checkActiveSubscriber = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user as IReqUser;
+  const result = await DashboardService.checkActiveSubscriber(user);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successful',
+    data: result,
+  });
+});
+
+
 export const DashboardController = {
   getAllUser,
   createSubscriptions,
@@ -248,5 +260,6 @@ export const DashboardController = {
   getMonthlyUserGrowth,
   addAboutUs,
   getAboutUs,
-  getAllSubscriber
+  getAllSubscriber,
+  checkActiveSubscriber
 };
