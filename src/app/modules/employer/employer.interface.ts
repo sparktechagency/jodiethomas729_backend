@@ -8,6 +8,7 @@ export type ICompany = Document & {
   locations: string;
   service: string;
   details: string;
+  website_link: string;
 }
 
 export type ISocialMedia = Document & {
@@ -21,6 +22,7 @@ export type IEmployer = Document & {
   authId: mongoose.Schema.Types.ObjectId;
   name: string;
   email: string;
+  banner_image: string;
   profile_image?: string | null;
   phone_number?: string | null;
   isPhoneNumberVerified: boolean;
@@ -31,4 +33,8 @@ export type IEmployer = Document & {
   createdAt?: Date;
   updatedAt?: Date;
   duration_time: Date;
+  organization_types: string;
+  industry_types: string;
+  team_size: string;
+  years_of_establishment: Date;
 }

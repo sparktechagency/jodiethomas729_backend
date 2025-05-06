@@ -32,6 +32,11 @@ const updateMyProfile = async (req: RequestData): Promise<IEmployer> => {
     profile_image = `/images/profile/${files.profile_image[0].filename}`;
   }
 
+  let banner_image: string | undefined = undefined;
+  if (files && files.banner_image) {
+    banner_image = `/images/profile/${files.banner_image[0].filename}`;
+  }
+
   if (data?.company) {
     data.company = JSON.parse(data?.company);
   }
@@ -50,7 +55,7 @@ const updateMyProfile = async (req: RequestData): Promise<IEmployer> => {
     ),
     Employer.findByIdAndUpdate(
       userId,
-      { profile_image, ...updatedData },
+      { profile_image, banner_image, ...updatedData },
       {
         new: true,
       }
