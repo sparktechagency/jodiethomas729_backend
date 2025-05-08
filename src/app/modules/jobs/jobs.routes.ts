@@ -11,5 +11,10 @@ router.post('/create-jobs',
 router.patch('/update-jobs/:id',
     auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
     JobsController.updateJobs);
+router.get('/all/employer',
+    auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
+    JobsController.getEmployerJobs);
+
+
 
 export const JobsRoutes = router;

@@ -16,3 +16,11 @@ export interface IJobs extends Document {
     availabilities: string;
     status: string;
 }
+
+
+export interface IApplications extends Document {
+    authId: Schema.Types.ObjectId;
+    jobId: Schema.Types.ObjectId;
+    resume: string;
+    cover_letter: string;
+}

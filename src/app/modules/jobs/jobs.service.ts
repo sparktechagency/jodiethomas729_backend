@@ -18,8 +18,6 @@ const createNewJob = async (user: IReqUser, payload: IJobs) => {
             authId: new Types.ObjectId(authId),
         };
 
-        console.log('====', jobData)
-
         const job = new Jobs(jobData);
         await job.save();
         return job;
@@ -31,7 +29,6 @@ const createNewJob = async (user: IReqUser, payload: IJobs) => {
         throw new AppError(404, 'Unexpected error while creating job');
     }
 };
-
 
 const updateJobs = async (jobId: string, payload: Partial<IJobs>) => {
 
@@ -62,8 +59,28 @@ const updateJobs = async (jobId: string, payload: Partial<IJobs>) => {
     }
 };
 
+const getEmployerJobs = async (user: IReqUser, query: any) => {
+    const { page, limit } = query;
+    const { authId } = user;
+    console.log("query", authId)
+
+    const transitionQuery = new QueryBuilder(Jobs.find({ authId })
+        , query)
+        .search([])
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
+
+    const result = await transitionQuery.modelQuery;
+    const meta = await transitionQuery.countTotal();
+    // console.log(result)
+    return { result, meta };
+
+};
 
 export const JobsServices = {
     createNewJob,
-    updateJobs
+    updateJobs,
+    getEmployerJobs
 }

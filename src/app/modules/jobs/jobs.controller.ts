@@ -31,8 +31,22 @@ const updateJobs = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getEmployerJobs = catchAsync(async (req: Request, res: Response) => {
+    const query = req.query;
+    const user = req.user;
+    const result = await JobsServices.getEmployerJobs(user as any, query as any);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Get jobs successfully",
+        data: result,
+    });
+});
+
 
 export const JobsController = {
     createNewJobs,
-    updateJobs
+    updateJobs,
+    getEmployerJobs
 }

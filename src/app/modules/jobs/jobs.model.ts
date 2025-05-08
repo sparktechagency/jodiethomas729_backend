@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { IJobs } from "./jobs.interface";
+import { IApplications, IJobs } from "./jobs.interface";
 
 const JobsSchema = new Schema<IJobs>(
     {
@@ -31,13 +31,28 @@ const JobsSchema = new Schema<IJobs>(
         application_dateline: { type: Date },
         locations: { type: String },
         descriptions: { type: String, required: true },
+        status: {
+            type: String,
+            enum: ["Active", "Expired"],
+            default: "Active"
+        },
         availabilities: { type: String },
-        status: { type: String, enum: ["Active", "Expired"], default: "Active" },
+
+    },
+    { timestamps: true }
+);
+
+const ApplicationsSchema = new Schema<IApplications>(
+    {
+        authId: { type: Schema.Types.ObjectId, ref: 'Auth', required: true },
+        jobId: { type: Schema.Types.ObjectId, ref: 'Jobs', required: true },
+        resume: { type: String, required: true },
+        cover_letter: { type: String, required: true },
     },
     { timestamps: true }
 );
 
 
 const Jobs: Model<IJobs> = mongoose.model<IJobs>('Jobs', JobsSchema);
-
-export { Jobs };
+const Applications: Model<IApplications> = mongoose.model<IApplications>('Applications', ApplicationsSchema);
+export { Jobs, Applications };
