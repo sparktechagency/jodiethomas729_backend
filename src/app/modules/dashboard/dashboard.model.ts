@@ -29,7 +29,6 @@ const SubscriptionSchema = new Schema<ISubscriptions>({
         type: String,
     }
 
-
 }, { timestamps: true });
 
 

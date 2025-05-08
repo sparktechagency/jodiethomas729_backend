@@ -4,6 +4,7 @@ import { MessageRoutes } from '../modules/messages/message.routes';
 import { NotificationRoutes } from '../modules/notifications/notifications.routes';
 import { DashboardRoutes } from '../modules/dashboard/dashboard.routes';
 import { PaymentRoutes } from '../modules/payment/payment.routes';
+import { JobsRoutes } from '../modules/jobs/jobs.routes';
 
 const router = express.Router();
 
@@ -23,7 +24,11 @@ const moduleRoutes = [
     path: '/dashboard',
     route: DashboardRoutes,
   },
-  // -- progressing
+  {
+    path: '/jobs',
+    route: JobsRoutes,
+  },
+  // -- done
   {
     path: '/payment',
     route: PaymentRoutes,
