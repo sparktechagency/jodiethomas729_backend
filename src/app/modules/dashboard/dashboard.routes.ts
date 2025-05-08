@@ -66,19 +66,34 @@ router.delete(
   DashboardController.deleteCategory,
 );
 
+// =========================================
+// router.get(
+//   '/all_employear',
+//   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+//   DashboardController.allCategory,
+// );
+// router.get(
+//   '/employear_details/:authId',
+//   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+//   DashboardController.allCategory,
+// );
+// router.get(
+//   '/employear_job_post/:authId',
+//   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+//   DashboardController.allCategory,
+// );
 // ========================
-// router.post('/add-faqs',
-//   DashboardController.addFaq,
+// router.get(
+//   '/all_jobs',
+//   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+//   DashboardController.allCategory,
 // );
-// router.patch('/update-faqs/:id',
-//   DashboardController.updateFaq,
+// router.get(
+//   '/job_applications/:jobId',
+//   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+//   DashboardController.allCategory,
 // );
-// router.delete('/delete-faqs/:id',
-//   DashboardController.deleteFaq,
-// );
-// router.get('/get-faqs',
-//   DashboardController.getFaq,
-// );
+// ==========================
 router.post('/addupdate-termsConditions',
   DashboardController.addTermsConditions,
 );

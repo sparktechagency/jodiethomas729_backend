@@ -31,6 +31,11 @@ const JobsSchema = new Schema<IJobs>(
         application_dateline: { type: Date },
         locations: { type: String },
         descriptions: { type: String, required: true },
+        applications: {
+            type: [Schema.Types.ObjectId],
+            ref: 'Applications',
+            default: [],
+        },
         status: {
             type: String,
             enum: ["Active", "Expired"],
