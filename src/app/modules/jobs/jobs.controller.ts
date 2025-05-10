@@ -85,6 +85,31 @@ const getJobsDetails = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const makeExpireJobs = catchAsync(async (req: Request, res: Response) => {
+    const body = req.body;
+    const id = req.params.id;
+    const result = await JobsServices.makeExpireJobs(id as any, body as any);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: `Status ${body?.status} - Update Successfully`,
+        data: result,
+    });
+});
+
+const getAllApplyCandidate = catchAsync(async (req: Request, res: Response) => {
+    const query = req.query;
+    const user = req.user;
+    const result = await JobsServices.getAllApplyCandidate(user as IReqUser, query as any);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Get successfully",
+        data: result,
+    });
+});
 
 
 export const JobsController = {
@@ -93,5 +118,7 @@ export const JobsController = {
     getEmployerJobs,
     applyJobs,
     getJobsApplications,
-    getJobsDetails
+    getJobsDetails,
+    makeExpireJobs,
+    getAllApplyCandidate
 }

@@ -9,13 +9,14 @@ import AppError from "../../../errors/AppError";
 
 // ======================================
 const createNewJob = async (user: IReqUser, payload: IJobs) => {
-    const { authId } = user;
+    const { authId, userId } = user;
     try {
         const parsedData = jobValidationSchema.parse(payload);
 
         const jobData = {
             ...parsedData,
             authId: new Types.ObjectId(authId),
+            userId: new Types.ObjectId(userId),
         };
 
         const job = new Jobs(jobData);
@@ -131,7 +132,7 @@ const getJobsApplications = async (user: IReqUser, query: any) => {
 
     const transitionQuery = new QueryBuilder(Applications.find({ jobId }).populate({
         path: "userId",
-        select: "name email profile_image phone_number details present_address gender skill"
+        // select: "name email profile_image phone_number details present_address gender skill"
     })
         , query)
         .search([])
@@ -153,7 +154,7 @@ const getJobsDetails = async (query: any) => {
 
     const transitionQuery = new QueryBuilder(Applications.find({ jobId }).populate({
         path: "userId",
-        select: "name email profile_image phone_number details present_address gender skill"
+        // select: "name email profile_image phone_number details present_address gender skill"
     })
         , query)
         .search([])
@@ -168,6 +169,54 @@ const getJobsDetails = async (query: any) => {
     return { jobDetails, result, meta };
 };
 
+const makeExpireJobs = async (
+    jobId: string,
+    payload: any
+) => {
+    try {
+        const job = await Jobs.findById(jobId);
+
+        if (!job) {
+            throw new AppError(404, "Job not found.");
+        }
+
+        console.log("payload", payload)
+
+        const result = await Jobs.findByIdAndUpdate(jobId, payload, { new: true });
+
+        return result;
+
+    } catch (error: any) {
+        throw new AppError(500, error.message);
+    }
+};
+
+const getAllApplyCandidate = async (user: IReqUser, query: any) => {
+    const { page, limit, jobId } = query;
+    const { userId } = user;
+
+    const transitionQuery = new QueryBuilder(
+        Applications.find({ userId }).populate({
+            path: "jobId",
+            populate: {
+                path: "authId",
+                select: "profile_image organization_types years_of_establishment company socialMedia"
+            }
+        }),
+        query
+    )
+        .search([])
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
+
+    const result = await transitionQuery.modelQuery;
+    const meta = await transitionQuery.countTotal();
+    // console.log(result)
+    return { result, meta };
+};
+
 
 export const JobsServices = {
     createNewJob,
@@ -175,5 +224,7 @@ export const JobsServices = {
     getEmployerJobs,
     applyJobs,
     getJobsApplications,
-    getJobsDetails
+    getJobsDetails,
+    makeExpireJobs,
+    getAllApplyCandidate
 }

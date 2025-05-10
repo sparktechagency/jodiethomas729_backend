@@ -14,38 +14,14 @@ const storage = new CloudinaryStorage({
         return {
             folder: 'real_estate',
             resource_type: fileType,
-            allowed_formats: [
-                'jpg', 'jpeg', 'png', 'gif',
-                'mp4', 'avi', 'mov',
-                'pdf', 'doc', 'docx', 'odt', 'rtf', 'txt'
-            ],
             public_id: `${Date.now()}-${file.originalname}`,
         };
     },
 });
 
+// No fileFilter and no allowed_formats - this allows all file types
 const uploadC = multer({
     storage,
-    fileFilter: (req, file, cb) => {
-        console.log('Uploading:', file.originalname);
-
-        const allowedMimeTypes = [
-            'image/jpeg', 'image/png', 'image/gif',
-            'application/pdf',
-            'application/msword',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/vnd.oasis.opendocument.text',
-            'application/rtf',
-            'text/plain',
-            'video/mp4', 'video/avi', 'video/mov'
-        ];
-
-        if (allowedMimeTypes.includes(file.mimetype)) {
-            cb(null, true);
-        } else {
-            cb(new Error('Invalid file type. Only images, videos, and documents are allowed.'));
-        }
-    },
 });
 
 export default uploadC;

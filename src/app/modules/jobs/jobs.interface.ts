@@ -2,6 +2,7 @@ import { Schema, Types } from "mongoose";
 
 export interface IJobs extends Document {
     authId: Schema.Types.ObjectId;
+    userId: Schema.Types.ObjectId;
     title: string;
     types: string;
     category: Schema.Types.ObjectId;

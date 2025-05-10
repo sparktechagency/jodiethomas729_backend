@@ -26,7 +26,7 @@ const globalErrorHandler: ErrorRequestHandler = (
     : console.error('globalErrorHandler', error);
 
   let statusCode = 500;
-  let message = 'Something went wrong !';
+  let message = error?.message || "Invalid request send!";
   let errorMessages: IGenericErrorMessage[] = [];
 
   if (error?.name === 'ValidationError') {
@@ -67,11 +67,11 @@ const globalErrorHandler: ErrorRequestHandler = (
     message = error.message;
     errorMessages = error?.message
       ? [
-          {
-            path: '',
-            message: error?.message,
-          },
-        ]
+        {
+          path: '',
+          message: error?.message,
+        },
+      ]
       : [];
   } else if (error.code === 11000) {
     statusCode = 409;
@@ -105,11 +105,11 @@ const globalErrorHandler: ErrorRequestHandler = (
     message = error?.message;
     errorMessages = error?.message
       ? [
-          {
-            path: '',
-            message: error?.message,
-          },
-        ]
+        {
+          path: '',
+          message: error?.message,
+        },
+      ]
       : [];
   }
 

@@ -4,6 +4,7 @@ import { IApplications, IJobs } from "./jobs.interface";
 const JobsSchema = new Schema<IJobs>(
     {
         authId: { type: Schema.Types.ObjectId, ref: 'Auth', required: true },
+        userId: { type: Schema.Types.ObjectId, ref: 'Employer', required: true },
         title: { type: String, required: true },
         category: {
             type: Schema.Types.ObjectId,

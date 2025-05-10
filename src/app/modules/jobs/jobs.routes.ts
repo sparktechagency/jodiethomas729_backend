@@ -25,6 +25,13 @@ router.get('/applications',
 router.get('/details',
     auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
     JobsController.getJobsDetails);
+router.get('/make_expire_jobs/:id',
+    auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
+    JobsController.makeExpireJobs);
+router.get('/get_all_apply_candidate',
+    auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+    JobsController.getAllApplyCandidate);
+
 
 
 
