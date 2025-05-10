@@ -42,14 +42,13 @@ const JobsSchema = new Schema<IJobs>(
             default: "Active"
         },
         availabilities: { type: String },
-
     },
     { timestamps: true }
 );
 
 const ApplicationsSchema = new Schema<IApplications>(
     {
-        authId: { type: Schema.Types.ObjectId, ref: 'Auth', required: true },
+        userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         jobId: { type: Schema.Types.ObjectId, ref: 'Jobs', required: true },
         resume: { type: String, required: true },
         cover_letter: { type: String, required: true },

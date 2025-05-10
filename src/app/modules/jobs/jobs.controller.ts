@@ -3,7 +3,7 @@ import catchAsync from "../../../shared/catchasync";
 import sendResponse from "../../../shared/sendResponse";
 import { JobsServices } from "./jobs.service";
 import { IReqUser } from "../auth/auth.interface";
-import { IJobs } from "./jobs.interface";
+import { IApplications, IJobs } from "./jobs.interface";
 
 const createNewJobs = catchAsync(async (req: Request, res: Response) => {
     const user = req.user;
@@ -44,9 +44,54 @@ const getEmployerJobs = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const applyJobs = catchAsync(async (req: Request, res: Response) => {
+    const payload = req.body as IApplications;
+    const user = req.user as IReqUser;
+    const jobId = req.params.jobId;
+    const files = req.file;
+    const result = await JobsServices.applyJobs(jobId as any, user as IReqUser, payload as IApplications, files as any);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Application Successfully",
+        data: result,
+    });
+});
+
+const getJobsApplications = catchAsync(async (req: Request, res: Response) => {
+    const query = req.query;
+    const user = req.user;
+    const result = await JobsServices.getJobsApplications(user as any, query as any);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Applications jobs successfully",
+        data: result,
+    });
+});
+
+const getJobsDetails = catchAsync(async (req: Request, res: Response) => {
+    const query = req.query;
+    const user = req.user;
+    const result = await JobsServices.getJobsDetails(query as any);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Jobs details successfully",
+        data: result,
+    });
+});
+
+
 
 export const JobsController = {
     createNewJobs,
     updateJobs,
-    getEmployerJobs
+    getEmployerJobs,
+    applyJobs,
+    getJobsApplications,
+    getJobsDetails
 }

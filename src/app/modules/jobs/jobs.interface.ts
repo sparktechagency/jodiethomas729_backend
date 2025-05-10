@@ -20,7 +20,7 @@ export interface IJobs extends Document {
 
 
 export interface IApplications extends Document {
-    authId: Schema.Types.ObjectId;
+    userId: Schema.Types.ObjectId;
     jobId: Schema.Types.ObjectId;
     resume: string;
     cover_letter: string;
