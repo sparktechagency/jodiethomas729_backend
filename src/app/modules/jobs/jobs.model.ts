@@ -12,7 +12,7 @@ const JobsSchema = new Schema<IJobs>(
             required: true
         },
         salary: { type: Number },
-        education: {
+        experience: {
             type: String,
             required: true,
             enum: ["freshers", "1_2_years", "2_4_years", "4_6_years", "6_8_years", "8_10_years", "10_12_years", "12_14_years", "15_years"]
@@ -22,7 +22,7 @@ const JobsSchema = new Schema<IJobs>(
             required: true,
             enum: ["full_time", "part_time", "internship", "remote", "temporary", "contract_base"]
         },
-        experience: {
+        education: {
             type: String,
             required: true,
             enum: ["high_school", "intermediate", "bachelor_degree", "graduation", "master_degree"]

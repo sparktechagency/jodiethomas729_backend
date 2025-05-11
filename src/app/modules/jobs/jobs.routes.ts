@@ -39,10 +39,25 @@ router.get('/get_user_favorites',
     auth(ENUM_USER_ROLE.USER),
     JobsController.getUserFavorites
 );
-// router.get('/candidate_overview',
-//     auth(ENUM_USER_ROLE.USER),
-//     JobsController.getCandidateOverview
-// );
+router.get('/candidate_overview',
+    auth(ENUM_USER_ROLE.USER),
+    JobsController.getCandidateOverview
+);
+router.get('/candidate_job_alert',
+    auth(ENUM_USER_ROLE.USER),
+    JobsController.getCandidateJobAlert
+);
+// =Home======================
+router.get('/get_category_&count_jobs',
+    auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.EMPLOYER),
+    JobsController.allCategoryWithJobs
+);
+router.get('/get_recent_jobs',
+    JobsController.getRecentJobs
+);
+router.get('/get_search_filter',
+    JobsController.getSearchFilterJobs
+);
 
 
 

@@ -25,7 +25,7 @@ export const jobValidationSchema = z.object({
         .number({ invalid_type_error: 'Salary must be a number' })
         .optional(),
 
-    education: z
+    experience: z
         .enum(
             [
                 'freshers', '1_2_years', '2_4_years', '4_6_years',
@@ -46,7 +46,7 @@ export const jobValidationSchema = z.object({
         )
         .optional(),
 
-    experience: z
+    education: z
         .enum(
             [
                 'high_school', 'intermediate', 'bachelor_degree',

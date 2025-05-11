@@ -112,7 +112,8 @@ router.post('/about_us',
 router.get('/about_us',
   DashboardController.getAboutUs,
 );
-// ================================  
+// ===Home page website=============================  
+
 
 
 export const DashboardRoutes = router;

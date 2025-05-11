@@ -415,6 +415,19 @@ const getAboutUs = async () => {
     return await AboutUs.findOne();
 };
 
+const allCategoryWithJobs = async (query: Record<string, unknown>) => {
+    const categoryQuery = new QueryBuilder(Category.find(), query)
+        .search(['category'])
+        .filter()
+        .fields();
+
+    const result = await categoryQuery.modelQuery;
+
+    return {
+        data: result,
+    };
+};
+
 export const DashboardService = {
     totalCount,
     getAllUser,

@@ -7,7 +7,7 @@ import { Applications, JobAlert, Jobs } from "./jobs.model";
 import AppError from "../../../errors/AppError";
 import ApiError from "../../../errors/ApiError";
 import User from "../user/user.model";
-
+import { Category } from "../dashboard/dashboard.model";
 
 // ======================================
 const createNewJob = async (user: IReqUser, payload: IJobs) => {
@@ -43,8 +43,6 @@ const sendJobAlerts = async (job: any) => {
             alert_job_type: { $in: [job.category] },
             status: 'active',
         });
-        console.log("dhsd", matchingUsers)
-        console.log("dhsd", job)
 
         // const skillMatchedUsers = matchingUsers.filter(user => {
         //     return user.skill?.some(skill => job.skill?.includes(skill));
@@ -183,7 +181,7 @@ const getJobsApplications = async (user: IReqUser, query: any) => {
 const getJobsDetails = async (query: any) => {
     const { page, limit, jobId } = query;
 
-    const jobDetails = await Jobs.findById(jobId).select("-applications")
+    const jobDetails = await Jobs.findById(jobId).select("-applications -favorite")
 
     const transitionQuery = new QueryBuilder(Applications.find({ jobId }).populate({
         path: "userId",
@@ -270,7 +268,7 @@ const addRemoveFavorites = async (authId: Schema.Types.ObjectId, jobId: Types.Ob
 const getUserFavorites = async (user: IReqUser) => {
     const authId = user.authId;
 
-    const jobs = await Jobs.find({ favorite: authId })
+    const jobs = await Jobs.find({ favorite: { $in: [authId] } })
         .populate({
             path: "userId",
             select: "profile_image organization_types years_of_establishment company socialMedia"
@@ -280,10 +278,266 @@ const getUserFavorites = async (user: IReqUser) => {
 
     const updatedJobs = jobs.map(job => ({
         ...job,
-        favorite: true
+        isFavorite: true
     }));
 
     return { jobs: updatedJobs };
+};
+
+const getCandidateOverview = async (user: IReqUser) => {
+    const { authId, userId } = user;
+
+    const favoriteJobCount = await Jobs.countDocuments({ favorite: { $in: [authId] } });
+    const applicationCount = await Applications.countDocuments({ userId });
+    const jobAlertCount = await JobAlert.countDocuments({ userId });
+    const recentlyApplied = await Applications.find({ userId })
+        .populate({
+            path: "jobId",
+            populate: {
+                path: "userId",
+                select: "profile_image organization_types years_of_establishment company socialMedia"
+            }
+        }).sort({ createdAt: -1 }).limit(7);
+    const newAlertCount = await JobAlert.countDocuments({ userId, isOpen: false });
+
+    return {
+        favoriteJobCount,
+        applicationCount,
+        jobAlertCount,
+        newAlertCount,
+        recentlyApplied,
+    };
+};
+
+const getCandidateJobAlert = async (user: IReqUser, query: any) => {
+    const { page, limit } = query;
+    const { userId } = user;
+
+    const transitionQuery = new QueryBuilder(
+        JobAlert.find({ userId }).populate({
+            path: "jobId",
+            populate: {
+                path: "userId",
+                select: "profile_image organization_types years_of_establishment company socialMedia"
+            }
+        }),
+        query
+    )
+        .search([])
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
+
+    const result = await transitionQuery.modelQuery;
+    const meta = await transitionQuery.countTotal();
+    // updates status;
+    await JobAlert.updateMany(
+        { isOpen: false },
+        { $set: { isOpen: true } }
+    );
+
+    return { result, meta };
+};
+
+const allCategoryWithJobs = async () => {
+
+    const jobCounts = await Jobs.aggregate([
+        {
+            $group: {
+                _id: "$category",
+                jobCount: { $sum: 1 }
+            }
+        }
+    ]);
+
+    const countMap = new Map(jobCounts.map(item => [item._id.toString(), item.jobCount]));
+
+    const categories = await Category.find();
+
+    const categoryWithCounts = categories.map(cat => ({
+        ...cat.toObject(),
+        jobCount: countMap.get(cat._id.toString()) || 0
+    }));
+
+    categoryWithCounts.sort((a, b) => b.jobCount - a.jobCount);
+
+    return {
+        categories: categoryWithCounts
+    };
+};
+
+const getRecentJobs = async (query: any) => {
+    const { authId } = query;
+
+    console.log("authId", authId)
+    if (authId) {
+        delete query.authId
+    }
+
+    const transitionQuery = new QueryBuilder(
+        // @ts-ignore
+        Jobs.find().select("title category locations types experience education createdAt userId favorite").lean(),
+        query
+    )
+        .search([])
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    let result: any = await transitionQuery.modelQuery;
+    const meta = await transitionQuery.countTotal();
+    if (result?.length && authId) {
+        result = result.map((job: any) => {
+            const isFavorite = Array.isArray(job.favorite) && job.favorite.some((id: any) => id.toString() === authId);
+            const { favorite, ...jobWithoutFavorite } = job;
+            return {
+                ...jobWithoutFavorite,
+                isFavorite,
+            };
+        });
+    } else {
+        result = result?.map((job: any) => {
+            const isFavorite = false
+            const { favorite, ...jobWithoutFavorite } = job;
+            return {
+                ...jobWithoutFavorite,
+                isFavorite,
+            };
+        });
+    }
+
+
+    return { result, meta };
+};
+
+const getSearchFilterJobs = async (query: any) => {
+    let {
+        experience,
+        types,
+        education,
+        category,
+        title,
+        locations,
+        authId,
+        page = 1,
+        limit = 10,
+    } = query;
+
+    const filter: any = {
+        status: "Active",
+    };
+
+    const parseArray = (value: any) => {
+        try {
+            const parsed = JSON.parse(value);
+            return Array.isArray(parsed) ? parsed : [parsed];
+        } catch {
+            return Array.isArray(value) ? value : [value];
+        }
+    };
+
+    if (experience) filter.experience = { $in: parseArray(experience) };
+    if (types) filter.types = { $in: parseArray(types) };
+    if (education) filter.education = { $in: parseArray(education) };
+    if (category) filter.category = { $in: parseArray(category) };
+
+    if (title || locations) {
+        filter.$or = [];
+        if (title) {
+            filter.$or.push({
+                title: { $regex: title, $options: "i" },
+            });
+        }
+        if (locations) {
+            filter.$or.push({
+                locations: { $regex: locations, $options: "i" },
+            });
+        }
+    }
+
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    let [jobs, total] = await Promise.all([
+        Jobs.find(filter)
+            .select("title category locations types experience education createdAt userId favorite")
+            .populate('category')
+            .populate({
+                path: "userId",
+                select: "profile_image organization_types years_of_establishment company"
+            })
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limitNum)
+            .lean(),
+
+        Jobs.countDocuments(filter)
+    ]);
+
+    if (jobs?.length && authId) {
+        // @ts-ignore
+        jobs = jobs?.map((job: any) => {
+            const isFavorite = Array.isArray(job.favorite) && job.favorite.some((id: any) => id.toString() === authId.toString());
+            const { favorite, ...jobWithoutFavorite } = job;
+            return {
+                ...jobWithoutFavorite,
+                isFavorite,
+            };
+        });
+    } else {
+        jobs = jobs?.map((job: any) => {
+            const isFavorite = false
+            const { favorite, ...jobWithoutFavorite } = job;
+            return {
+                ...jobWithoutFavorite,
+                isFavorite,
+            };
+        });
+    }
+
+    return {
+        jobs,
+        meta: {
+            page: pageNum,
+            limit: limitNum,
+            total,
+            totalPage: Math.ceil(total / limitNum),
+        },
+    };
+};
+
+const getJobsDetailsForCandidate = async (jobId: any) => {
+
+    const jobDetails = await Jobs.findById(jobId)
+        .populate({
+            path: "userId",
+            select: "profile_image organization_types years_of_establishment company socialMedia"
+        })
+        .populate('category')
+        .select("-favorite -applications")
+        .lean();
+
+    if (!jobDetails) {
+        throw new ApiError(404, "Job Not Found")
+    }
+
+    const relatedJobs = await Jobs.find({
+        // @ts-ignore
+        category: jobDetails.category?._id,
+        status: "Active"
+    })
+        .select("title category locations types experience education createdAt userId")
+        .limit(6)
+        .sort({ createdAt: -1 })
+        .populate('category');
+
+    return {
+        jobDetails,
+        relatedJobs
+    };
 };
 
 export const JobsServices = {
@@ -296,5 +550,11 @@ export const JobsServices = {
     makeExpireJobs,
     getAllApplyCandidate,
     addRemoveFavorites,
-    getUserFavorites
+    getUserFavorites,
+    getCandidateOverview,
+    getCandidateJobAlert,
+    allCategoryWithJobs,
+    getRecentJobs,
+    getSearchFilterJobs,
+    getJobsDetailsForCandidate
 }

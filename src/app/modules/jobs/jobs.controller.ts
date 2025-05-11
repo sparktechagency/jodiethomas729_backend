@@ -134,6 +134,62 @@ const getUserFavorites = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getCandidateOverview = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IReqUser;
+    const result = await JobsServices.getCandidateOverview(user);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Successful',
+        data: result,
+    });
+});
+
+const getCandidateJobAlert = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IReqUser;
+    const query = req.query as any;
+    const result = await JobsServices.getCandidateJobAlert(user, query as any);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Successful',
+        data: result,
+    });
+});
+
+const allCategoryWithJobs = catchAsync(async (req: Request, res: Response) => {
+    const result = await JobsServices.allCategoryWithJobs();
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Successful',
+        data: result,
+    });
+});
+
+const getRecentJobs = catchAsync(async (req: Request, res: Response) => {
+    const query = req.query;
+    const result = await JobsServices.getRecentJobs(query as any);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Successful',
+        data: result,
+    });
+});
+
+const getSearchFilterJobs = catchAsync(async (req: Request, res: Response) => {
+    const query = req.query;
+    const result = await JobsServices.getSearchFilterJobs(query as any);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Successful',
+        data: result,
+    });
+});
+
+
 export const JobsController = {
     createNewJobs,
     updateJobs,
@@ -144,5 +200,10 @@ export const JobsController = {
     makeExpireJobs,
     getAllApplyCandidate,
     toggleFavorite,
-    getUserFavorites
+    getUserFavorites,
+    getCandidateOverview,
+    getCandidateJobAlert,
+    allCategoryWithJobs,
+    getRecentJobs,
+    getSearchFilterJobs
 }
