@@ -88,6 +88,10 @@ const registrationAccount = async (payload: IAuth) => {
 
   other.authId = createAuth._id;
   other.email = email;
+  // if (other?.alert_job_type) {
+  //   other.alert_job_type = JSON.parse(other?.alert_job_type);
+  // }
+
   // other.profile_image = profile_image;
 
   // Role-based user creation

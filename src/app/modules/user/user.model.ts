@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema, Model } from "mongoose";
+import mongoose, { Document, Schema, Model, Types } from "mongoose";
 import { IEducational, IUser, IWorkExperience } from "./user.interface";
 
 const EducationalSchema = new Schema<IEducational>({
@@ -119,6 +119,10 @@ const UserSchema = new Schema<IUser>(
     },
     hobbies: {
       type: [String],
+    },
+    alert_job_type: {
+      type: [Schema.Types.ObjectId],
+      ref: "Category"
     },
     duration_time: {
       type: Date,

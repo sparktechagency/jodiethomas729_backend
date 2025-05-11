@@ -1,10 +1,12 @@
-import { Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import QueryBuilder from "../../../builder/QueryBuilder";
 import { IReqUser } from "../auth/auth.interface";
 import { IApplications, IJobs } from "./jobs.interface";
 import { jobValidationSchema } from "./jobValidation";
-import { Applications, Jobs } from "./jobs.model";
+import { Applications, JobAlert, Jobs } from "./jobs.model";
 import AppError from "../../../errors/AppError";
+import ApiError from "../../../errors/ApiError";
+import User from "../user/user.model";
 
 
 // ======================================
@@ -21,6 +23,10 @@ const createNewJob = async (user: IReqUser, payload: IJobs) => {
 
         const job = new Jobs(jobData);
         await job.save();
+
+        // 🔔 Trigger job alert logic
+        await sendJobAlerts(job);
+
         return job;
 
     } catch (error: any) {
@@ -28,6 +34,33 @@ const createNewJob = async (user: IReqUser, payload: IJobs) => {
             throw new AppError(404, 'Job creation failed: ' + error.errors.map((e: any) => e.message).join(', '));
         }
         throw new AppError(404, 'Unexpected error while creating job');
+    }
+};
+
+const sendJobAlerts = async (job: any) => {
+    try {
+        const matchingUsers = await User.find({
+            alert_job_type: { $in: [job.category] },
+            status: 'active',
+        });
+        console.log("dhsd", matchingUsers)
+        console.log("dhsd", job)
+
+        // const skillMatchedUsers = matchingUsers.filter(user => {
+        //     return user.skill?.some(skill => job.skill?.includes(skill));
+        // });
+
+        const alerts = matchingUsers.map(user => ({
+            userId: user._id,
+            jobId: job?._id,
+        }));
+
+        if (alerts.length > 0) {
+            await JobAlert.insertMany(alerts);
+        }
+
+    } catch (err) {
+        console.error("Failed to send job alerts:", err);
     }
 };
 
@@ -217,6 +250,41 @@ const getAllApplyCandidate = async (user: IReqUser, query: any) => {
     return { result, meta };
 };
 
+const addRemoveFavorites = async (authId: Schema.Types.ObjectId, jobId: Types.ObjectId) => {
+    const jobs = await Jobs.findById(jobId);
+    if (!jobs) {
+        throw new ApiError(404, "Job not found");
+    }
+    const isFavorites = jobs.favorite.includes(authId);
+
+    if (isFavorites) {
+        jobs.favorite = jobs.favorite.filter(id => id.toString() !== authId.toString());
+    } else {
+        jobs.favorite.push(authId);
+    }
+    await jobs.save();
+
+    return { message: isFavorites ? "Removed from favorites" : "Added to favorites" };
+};
+
+const getUserFavorites = async (user: IReqUser) => {
+    const authId = user.authId;
+
+    const jobs = await Jobs.find({ favorite: authId })
+        .populate({
+            path: "userId",
+            select: "profile_image organization_types years_of_establishment company socialMedia"
+        })
+        .select("-favorite -applications")
+        .lean();
+
+    const updatedJobs = jobs.map(job => ({
+        ...job,
+        favorite: true
+    }));
+
+    return { jobs: updatedJobs };
+};
 
 export const JobsServices = {
     createNewJob,
@@ -226,5 +294,7 @@ export const JobsServices = {
     getJobsApplications,
     getJobsDetails,
     makeExpireJobs,
-    getAllApplyCandidate
+    getAllApplyCandidate,
+    addRemoveFavorites,
+    getUserFavorites
 }

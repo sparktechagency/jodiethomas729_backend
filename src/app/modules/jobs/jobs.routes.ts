@@ -31,6 +31,18 @@ router.get('/make_expire_jobs/:id',
 router.get('/get_all_apply_candidate',
     auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
     JobsController.getAllApplyCandidate);
+router.patch('/toggle_favorite/:jobId',
+    auth(ENUM_USER_ROLE.USER),
+    JobsController.toggleFavorite
+);
+router.get('/get_user_favorites',
+    auth(ENUM_USER_ROLE.USER),
+    JobsController.getUserFavorites
+);
+// router.get('/candidate_overview',
+//     auth(ENUM_USER_ROLE.USER),
+//     JobsController.getCandidateOverview
+// );
 
 
 

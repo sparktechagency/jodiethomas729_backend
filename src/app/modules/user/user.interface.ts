@@ -14,6 +14,7 @@ export interface IUser extends Document {
   details?: string;
   educational_info?: IEducational[];
   work_experience?: IWorkExperience[];
+  alert_job_type: mongoose.Types.ObjectId[];
   skill?: string[];
   curricular_activities?: string[];
   hobbies?: string[];

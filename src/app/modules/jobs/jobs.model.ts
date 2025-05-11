@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema } from "mongoose";
-import { IApplications, IJobs } from "./jobs.interface";
+import { IApplications, IJobAlert, IJobs } from "./jobs.interface";
 
 const JobsSchema = new Schema<IJobs>(
     {
@@ -63,6 +63,16 @@ const ApplicationsSchema = new Schema<IApplications>(
 );
 
 
+const JobAlertSchema = new Schema<IJobAlert>({
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    jobId: { type: Schema.Types.ObjectId, ref: 'Jobs', required: true },
+    isOpen: { type: Boolean, default: false }
+},
+    { timestamps: true }
+);
+
+
 const Jobs: Model<IJobs> = mongoose.model<IJobs>('Jobs', JobsSchema);
 const Applications: Model<IApplications> = mongoose.model<IApplications>('Applications', ApplicationsSchema);
-export { Jobs, Applications };
+const JobAlert: Model<IJobAlert> = mongoose.model<IJobAlert>('JobAlert', JobAlertSchema);
+export { Jobs, Applications, JobAlert };

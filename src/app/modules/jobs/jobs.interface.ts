@@ -1,6 +1,7 @@
 import { Schema, Types } from "mongoose";
 
 export interface IJobs extends Document {
+    _id: Schema.Types.ObjectId;
     authId: Schema.Types.ObjectId;
     userId: Schema.Types.ObjectId;
     title: string;
@@ -27,3 +28,10 @@ export interface IApplications extends Document {
     resume: string;
     cover_letter: string;
 }
+
+export interface IJobAlert extends Document {
+    userId: Schema.Types.ObjectId;
+    jobId: Schema.Types.ObjectId;
+    isOpen: boolean;
+}
+

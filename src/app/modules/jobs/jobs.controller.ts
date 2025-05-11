@@ -111,6 +111,28 @@ const getAllApplyCandidate = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const toggleFavorite = catchAsync(async (req: Request, res: Response) => {
+    const { authId } = req.user as IReqUser;
+    const jobId = req.params.jobId;
+    const result = await JobsServices.addRemoveFavorites(authId as any, jobId as any);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: result.message,
+        data: result,
+    });
+});
+
+const getUserFavorites = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user as IReqUser;
+    const result = await JobsServices.getUserFavorites(user);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Successful',
+        data: result,
+    });
+});
 
 export const JobsController = {
     createNewJobs,
@@ -120,5 +142,7 @@ export const JobsController = {
     getJobsApplications,
     getJobsDetails,
     makeExpireJobs,
-    getAllApplyCandidate
+    getAllApplyCandidate,
+    toggleFavorite,
+    getUserFavorites
 }
