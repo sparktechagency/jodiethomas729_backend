@@ -37,6 +37,11 @@ const JobsSchema = new Schema<IJobs>(
             ref: 'Applications',
             default: [],
         },
+        favorite: {
+            type: [Schema.Types.ObjectId],
+            ref: 'Auth',
+            default: [],
+        },
         status: {
             type: String,
             enum: ["Active", "Expired"],

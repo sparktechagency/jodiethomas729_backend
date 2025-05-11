@@ -17,6 +17,7 @@ export interface IJobs extends Document {
     availabilities: string;
     status: string;
     applications: Schema.Types.ObjectId[];
+    favorite: Schema.Types.ObjectId[];
 }
 
 

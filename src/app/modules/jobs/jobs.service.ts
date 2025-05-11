@@ -199,7 +199,7 @@ const getAllApplyCandidate = async (user: IReqUser, query: any) => {
         Applications.find({ userId }).populate({
             path: "jobId",
             populate: {
-                path: "authId",
+                path: "userId",
                 select: "profile_image organization_types years_of_establishment company socialMedia"
             }
         }),
