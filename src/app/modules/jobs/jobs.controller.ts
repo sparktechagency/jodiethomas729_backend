@@ -189,6 +189,17 @@ const getSearchFilterJobs = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getJobsDetailsForCandidate = catchAsync(async (req: Request, res: Response) => {
+    const jobId = req.params.jobId;
+    const result = await JobsServices.getJobsDetailsForCandidate(jobId as any);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Successful',
+        data: result,
+    });
+});
+
 
 export const JobsController = {
     createNewJobs,
@@ -205,5 +216,6 @@ export const JobsController = {
     getCandidateJobAlert,
     allCategoryWithJobs,
     getRecentJobs,
-    getSearchFilterJobs
+    getSearchFilterJobs,
+    getJobsDetailsForCandidate
 }

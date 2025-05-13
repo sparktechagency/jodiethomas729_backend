@@ -23,6 +23,10 @@ export interface IUser extends Document {
   updatedAt?: Date;
   duration_time: Date;
   subscription_status: string;
+  category: mongoose.Types.ObjectId;
+  experience: string;
+  types: string;
+  education: string;
 }
 
 export interface IEducational {

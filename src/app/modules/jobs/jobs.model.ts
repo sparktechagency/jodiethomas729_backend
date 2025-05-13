@@ -62,7 +62,6 @@ const ApplicationsSchema = new Schema<IApplications>(
     { timestamps: true }
 );
 
-
 const JobAlertSchema = new Schema<IJobAlert>({
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     jobId: { type: Schema.Types.ObjectId, ref: 'Jobs', required: true },

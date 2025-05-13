@@ -25,7 +25,7 @@ router.get('/applications',
 router.get('/details',
     auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
     JobsController.getJobsDetails);
-router.get('/make_expire_jobs/:id',
+router.patch('/make_expire_jobs/:id',
     auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
     JobsController.makeExpireJobs);
 router.get('/get_all_apply_candidate',
@@ -58,8 +58,13 @@ router.get('/get_recent_jobs',
 router.get('/get_search_filter',
     JobsController.getSearchFilterJobs
 );
-
-
+router.get('/get_details/:jobId',
+    JobsController.getJobsDetailsForCandidate
+);
+// =======================================
+router.post('/apply/:jobId',
+    auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
+    JobsController.applyJobs);
 
 
 export const JobsRoutes = router;

@@ -74,6 +74,26 @@ const UserSchema = new Schema<IUser>(
       type: String,
       required: true,
     },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: 'Category',
+      required: true
+    },
+    experience: {
+      type: String,
+      required: true,
+      enum: ["freshers", "1_2_years", "2_4_years", "4_6_years", "6_8_years", "8_10_years", "10_12_years", "12_14_years", "15_years"]
+    },
+    types: {
+      type: String,
+      required: true,
+      enum: ["full_time", "part_time", "internship", "remote", "temporary", "contract_base"]
+    },
+    education: {
+      type: String,
+      required: true,
+      enum: ["high_school", "intermediate", "bachelor_degree", "graduation", "master_degree"]
+    },
     profile_image: {
       type: String,
       default: null,

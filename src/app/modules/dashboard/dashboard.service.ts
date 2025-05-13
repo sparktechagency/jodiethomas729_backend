@@ -416,15 +416,10 @@ const getAboutUs = async () => {
 };
 
 const allCategoryWithJobs = async (query: Record<string, unknown>) => {
-    const categoryQuery = new QueryBuilder(Category.find(), query)
-        .search(['category'])
-        .filter()
-        .fields();
+    const category = await Category.find()
 
-    const result = await categoryQuery.modelQuery;
 
     return {
-        data: result,
     };
 };
 
