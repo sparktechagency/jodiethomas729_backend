@@ -25,8 +25,14 @@ export interface IUser extends Document {
   subscription_status: string;
   category: mongoose.Types.ObjectId;
   experience: string;
-  types: string;
+  types: string[];
   education: string;
+  profile_private: boolean;
+  profile_access: {
+    eId: mongoose.Types.ObjectId;
+    access: boolean;
+  }[];
+  favorite: mongoose.Types.ObjectId[];
 }
 
 export interface IEducational {

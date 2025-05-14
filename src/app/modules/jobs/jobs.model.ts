@@ -1,5 +1,6 @@
 import mongoose, { Model, Schema } from "mongoose";
 import { IApplications, IJobAlert, IJobs } from "./jobs.interface";
+import { access } from "fs";
 
 const JobsSchema = new Schema<IJobs>(
     {

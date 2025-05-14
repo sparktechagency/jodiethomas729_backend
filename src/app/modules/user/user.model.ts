@@ -77,22 +77,22 @@ const UserSchema = new Schema<IUser>(
     category: {
       type: Schema.Types.ObjectId,
       ref: 'Category',
-      required: true
     },
     experience: {
       type: String,
-      required: true,
       enum: ["freshers", "1_2_years", "2_4_years", "4_6_years", "6_8_years", "8_10_years", "10_12_years", "12_14_years", "15_years"]
     },
     types: {
-      type: String,
-      required: true,
+      type: [String],
       enum: ["full_time", "part_time", "internship", "remote", "temporary", "contract_base"]
     },
     education: {
       type: String,
-      required: true,
       enum: ["high_school", "intermediate", "bachelor_degree", "graduation", "master_degree"]
+    },
+    profile_private: {
+      type: Boolean,
+      default: false
     },
     profile_image: {
       type: String,
@@ -110,10 +110,10 @@ const UserSchema = new Schema<IUser>(
       type: String,
       default: null,
     },
-    gender: {
-      type: String,
-      default: null,
-    },
+    // gender: {
+    //   type: String,
+    //   default: null,
+    // },
     present_address: {
       type: String,
       default: null,
@@ -144,6 +144,23 @@ const UserSchema = new Schema<IUser>(
       type: [Schema.Types.ObjectId],
       ref: "Category"
     },
+    favorite: {
+      type: [Schema.Types.ObjectId],
+      ref: 'Auth',
+      default: [],
+    },
+    profile_access: {
+      type: [{
+        eId: {
+          type: Schema.Types.ObjectId,
+          ref: 'Auth'
+        },
+        access: {
+          type: Boolean
+        }
+      }],
+      default: []
+    },
     duration_time: {
       type: Date,
     },
@@ -159,8 +176,7 @@ const UserSchema = new Schema<IUser>(
     },
   }, {
   timestamps: true,
-}
-);
+});
 
 const User: Model<IUser> = mongoose.model<IUser>("User", UserSchema);
 

@@ -200,6 +200,53 @@ const getJobsDetailsForCandidate = catchAsync(async (req: Request, res: Response
     });
 });
 
+const searchCandidate = catchAsync(async (req: Request, res: Response) => {
+    const query = req.query;
+    const user = req.user;
+    const result = await JobsServices.searchCandidate(user as IReqUser, query as any);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Successful',
+        data: result,
+    });
+});
+
+const profileAccessRequest = catchAsync(async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    const user = req.user;
+    const result = await JobsServices.profileAccessRequest(user as IReqUser, userId as string);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Profile access request sent successfully.',
+        data: result,
+    });
+});
+
+const acceptAccessRequest = catchAsync(async (req: Request, res: Response) => {
+    const employerId = req.params.employerId;
+    const user = req.user;
+    const result = await JobsServices.acceptAccessRequest(user as IReqUser, employerId as string);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Access request accepted successfully.',
+        data: result,
+    });
+});
+
+const getUserProfileDetails = catchAsync(async (req: Request, res: Response) => {
+    const userId = req.params.userId;
+    const user = req.user;
+    const result = await JobsServices.getUserProfileDetails(user as IReqUser, userId as string);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User profile get successfully.',
+        data: result,
+    });
+});
 
 export const JobsController = {
     createNewJobs,
@@ -217,5 +264,9 @@ export const JobsController = {
     allCategoryWithJobs,
     getRecentJobs,
     getSearchFilterJobs,
-    getJobsDetailsForCandidate
+    getJobsDetailsForCandidate,
+    searchCandidate,
+    profileAccessRequest,
+    acceptAccessRequest,
+    getUserProfileDetails
 }

@@ -1,11 +1,14 @@
-import { Types } from 'mongoose'; 
-import { IAuth } from '../auth/auth.interface';
+import { Types } from 'mongoose';
 
-export type INotification = {
+export interface INotification {
+  userId: Types.ObjectId;
+  userIdType: 'User' | 'Admin' | 'Employer';
+  senderId: Types.ObjectId;
+  senderIdType: 'User' | 'Admin' | 'Employer';
+  admin?: boolean;
   title: string;
   message: string;
   status: boolean;
-  admin: boolean;
-  // plan_id: Types.ObjectId | IUpgradePlan;
-  user: Types.ObjectId | IAuth;
-};
+  createdAt?: Date;
+  updatedAt?: Date;
+}

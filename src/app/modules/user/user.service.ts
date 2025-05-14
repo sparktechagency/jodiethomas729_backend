@@ -42,6 +42,9 @@ const updateMyProfile = async (req: RequestData): Promise<IUser> => {
   if (data?.alert_job_type) {
     data.alert_job_type = JSON.parse(data?.alert_job_type);
   }
+  if (data?.types) {
+    data.types = JSON.parse(data?.types);
+  }
   if (data?.skill) {
     data.skill = JSON.parse(data?.skill);
   }

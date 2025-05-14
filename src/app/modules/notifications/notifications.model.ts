@@ -3,9 +3,25 @@ import { INotification } from './notifications.interface';
 
 const notificationSchema = new Schema<INotification>(
   {
-    user: {
+    userId: {
       type: Schema.Types.ObjectId,
-      ref: 'User',
+      required: true,
+      refPath: 'userIdType',
+    },
+    userIdType: {
+      type: String,
+      enum: ["User", "Admin", "Employer"],
+      required: true,
+    },
+    senderId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      refPath: 'senderIdType',
+    },
+    senderIdType: {
+      type: String,
+      enum: ["User", "Admin", "Employer"],
+      required: true,
     },
     admin: {
       type: Boolean,
@@ -22,18 +38,12 @@ const notificationSchema = new Schema<INotification>(
       type: Boolean,
       default: false,
     },
-    // plan_id: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: 'Plan',
-    // },
   },
   {
     timestamps: true,
-    toJSON: {
-      virtuals: true,
-    },
   },
 );
+
 const Notification: Model<INotification> = mongoose.model(
   'Notification',
   notificationSchema,

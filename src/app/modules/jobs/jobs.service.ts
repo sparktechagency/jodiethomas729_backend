@@ -8,6 +8,8 @@ import AppError from "../../../errors/AppError";
 import ApiError from "../../../errors/ApiError";
 import User from "../user/user.model";
 import { Category } from "../dashboard/dashboard.model";
+import Notification from "../notifications/notifications.model";
+import { IUser } from "../user/user.interface";
 
 // ======================================
 const createNewJob = async (user: IReqUser, payload: IJobs) => {
@@ -539,6 +541,206 @@ const getJobsDetailsForCandidate = async (jobId: any) => {
         relatedJobs
     };
 };
+// ==========================================
+const searchCandidate = async (user: IReqUser, query: any) => {
+    const { page = 1, limit = 10, education, experience, category } = query;
+    const { userId } = user;
+    const filter: any = {};
+    const parseArray = (value: any) => {
+        try {
+            const parsed = JSON.parse(value);
+            return Array.isArray(parsed) ? parsed : [parsed];
+        } catch {
+            return Array.isArray(value) ? value : [value];
+        }
+    };
+
+    if (education && education.length > 0) {
+        filter.education = { $in: parseArray(education) };
+    }
+
+    if (experience && experience.length > 0) {
+        filter.experience = { $in: parseArray(experience) };
+    }
+
+    if (category && category.length > 0) {
+        filter.category = { $in: parseArray(category) };
+    }
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const users = await User.find(filter).lean()
+
+        .select('name email profile_image skill details permanent_address present_address profile_private profile_access')
+        .skip(skip)
+        .limit(parseInt(limit));
+
+
+
+    const result = users.map((u: any) => {
+        const hasAccess = u.profile_access?.some((entry: any) =>
+            entry.eId?.toString() === userId && entry.access === true
+        );
+        if (hasAccess) {
+            u.profile_private = false;
+        }
+        delete u.profile_access;
+        return u;
+    });
+
+
+    const total = await User.countDocuments(filter);
+
+    const meta = {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPages: Math.ceil(total / limit),
+    };
+
+    return { result, meta };
+};
+
+const profileAccessRequest = async (user: IReqUser, userId: string) => {
+    const { userId: employerId } = user;
+
+    try {
+        const targetUser = await User.findById(userId);
+
+        if (!targetUser) {
+            throw new AppError(404, "User not found.");
+        }
+
+        if (!targetUser.profile_private) {
+            throw new AppError(400, "User profile is publicly open!");
+        }
+
+        const existingAccess = targetUser.profile_access.find(
+            (entry: any) => entry.eId.toString() === employerId
+        );
+
+        if (existingAccess) {
+            if (existingAccess.access === false) {
+                throw new AppError(400, "Access request already sent.");
+            } else if (existingAccess.access === true) {
+                throw new AppError(400, "Your access request has already been accepted.");
+            }
+        }
+
+        const result = await User.findByIdAndUpdate(
+            userId,
+            {
+                $push: {
+                    profile_access: {
+                        eId: employerId,
+                        access: false,
+                    },
+                },
+            },
+            { new: true }
+        );
+
+        // Create notification (assuming you have Notification model)
+        await Notification.create({
+            userId: userId,
+            senderId: employerId,
+            userIdType: "User",
+            senderIdType: "Employer",
+            type: "profile_access_request",
+            title: "New Profile Access Request",
+            message: "You have a new profile access request.",
+        });
+
+        return {
+            data: "Profile access request sent successfully.",
+        };
+    } catch (error: any) {
+        throw new AppError(500, error.message);
+    }
+};
+
+const acceptAccessRequest = async (user: IReqUser, employerId: string) => {
+    const { userId } = user;
+
+    try {
+        const targetUser = await User.findById(userId);
+
+        if (!targetUser) {
+            throw new AppError(404, "User not found.");
+        }
+
+        const accessRequest = targetUser.profile_access.find(
+            (entry: any) => entry.eId.toString() === employerId
+        );
+
+        if (!accessRequest) {
+            throw new AppError(400, "No access request found from this employer.");
+        }
+
+        if (accessRequest.access === true) {
+            throw new AppError(400, "Your request has already been accepted.");
+        }
+
+        const result = await User.findByIdAndUpdate(
+            userId,
+            {
+                $set: {
+                    "profile_access.$[elem].access": true,
+                },
+            },
+            {
+                arrayFilters: [{ "elem.eId": employerId }],
+                new: true,
+            }
+        );
+
+        // Create a notification for the employer
+        await Notification.create({
+            userId: employerId,
+            senderId: userId,
+            userIdType: "Employer",
+            senderIdType: "User",
+            type: "profile_access_accepted",
+            title: `Profile Access Request Accepted`,
+            message: `${targetUser.name}'s profile access request has been accepted.`,
+        });
+
+        return {
+            data: "Access request accepted successfully.",
+        };
+    } catch (error: any) {
+        throw new AppError(500, error.message);
+    }
+};
+
+const getUserProfileDetails = async (user: IReqUser, userId: any) => {
+    const { userId: employerId } = user;
+
+    const userDetails = await User.findById(userId)
+        .populate('category')
+        .select("-favorite")
+        .lean();
+
+    if (!userDetails) {
+        throw new ApiError(404, "User Not Found!")
+    }
+
+    if (userDetails.profile_private) {
+        const hasAccess = userDetails.profile_access?.some((entry: any) =>
+            entry.eId?.toString() === employerId && entry.access === true
+        );
+        if (!hasAccess) {
+            throw new ApiError(400, "You have not access for view this profile details")
+        }
+        // @ts-ignore
+        delete userDetails.profile_access;
+    }
+
+    return {
+        userDetails
+    };
+};
+
 
 export const JobsServices = {
     createNewJob,
@@ -556,5 +758,9 @@ export const JobsServices = {
     allCategoryWithJobs,
     getRecentJobs,
     getSearchFilterJobs,
-    getJobsDetailsForCandidate
+    getJobsDetailsForCandidate,
+    searchCandidate,
+    profileAccessRequest,
+    acceptAccessRequest,
+    getUserProfileDetails
 }

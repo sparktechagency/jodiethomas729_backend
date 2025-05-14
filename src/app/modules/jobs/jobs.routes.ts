@@ -62,9 +62,25 @@ router.get('/get_details/:jobId',
     JobsController.getJobsDetailsForCandidate
 );
 // =======================================
-router.post('/apply/:jobId',
+router.get('/search_candidate',
+    auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
+    JobsController.searchCandidate);
+router.patch('/profile_access_request/:userId',
+    auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
+    JobsController.profileAccessRequest
+);
+router.patch('/accept_access_request/:employerId',
     auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
-    JobsController.applyJobs);
+    JobsController.acceptAccessRequest
+);
+
+router.get('/get_user_profile_details/:userId',
+    auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
+    JobsController.getUserProfileDetails
+);
+
+
+// =============================================
 
 
 export const JobsRoutes = router;
