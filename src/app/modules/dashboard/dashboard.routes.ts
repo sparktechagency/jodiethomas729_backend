@@ -100,24 +100,32 @@ router.get(
   DashboardController.getJobDetails,
 );
 
+// =============================== 
+router.post(
+  '/blog_create',
+  uploadFile(),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.createJob
+);
 
+router.patch(
+  '/update_blog/:id',
+  uploadFile(),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.updateBlog
+);
 
-// router.get(
-//   '/employear_job_post/:authId',
-//   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-//   DashboardController.allCategory,
-// );
-// ========================
-// router.get(
-//   '/all_jobs',
-//   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-//   DashboardController.allCategory,
-// );
-// router.get(
-//   '/job_applications/:jobId',
-//   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-//   DashboardController.allCategory,
-// );
+router.delete(
+  '/delete_blog/:id',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.deleteBlog
+);
+
+router.get(
+  '/get_blog_details/:id',
+  DashboardController.getBlogDetails
+);
+
 // ==========================
 router.post('/addupdate-termsConditions',
   DashboardController.addTermsConditions,

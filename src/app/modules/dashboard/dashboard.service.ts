@@ -1,8 +1,8 @@
 import QueryBuilder from "../../../builder/QueryBuilder";
 import ApiError from "../../../errors/ApiError";
 import User from "../user/user.model";
-import { AboutUs, Category, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
-import { ICategory, ISubscriptions } from "./dsashbaord.interface";
+import { AboutUs, Blogs, Category, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
+import { IBlog, ICategory, ISubscriptions } from "./dsashbaord.interface";
 import { logger } from "../../../shared/logger";
 import { Transaction } from "../payment/payment.model";
 import Employer from "../employer/employer.model";
@@ -566,6 +566,37 @@ const getJobDetails = async (query: any, jobId: any) => {
 
     return { jobDetails, result, meta };
 };
+// ==================================
+const createBlog = async (payload: IBlog): Promise<IBlog> => {
+    const blog = new Blogs(payload);
+    return await blog.save();
+};
+
+const updateBlog = async (blogId: string, payload: Partial<IBlog>): Promise<IBlog | null> => {
+    const updatedBlog = await Blogs.findByIdAndUpdate(blogId, payload, {
+        new: true,
+        runValidators: true,
+    });
+    return updatedBlog;
+};
+
+const deleteBlog = async (blogId: string): Promise<IBlog | null> => {
+    const deletedBlog = await Blogs.findByIdAndDelete(blogId);
+    return deletedBlog;
+};
+
+const getBlogDetails = async (query: any, id: string) => {
+    const blog = await Blogs.findById(id)
+        .populate('category')
+        .lean();
+
+    if (!blog) {
+        throw new Error('Blog not found');
+    }
+
+    return blog;
+};
+
 
 export const DashboardService = {
     totalCount,
@@ -592,5 +623,9 @@ export const DashboardService = {
     getAllCandidate,
     getCandidateDetails,
     getAllJobs,
-    getJobDetails
+    getJobDetails,
+    createBlog,
+    updateBlog,
+    deleteBlog,
+    getBlogDetails
 };

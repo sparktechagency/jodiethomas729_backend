@@ -2,7 +2,7 @@ import { Request, RequestHandler, Response } from 'express';
 import sendResponse from '../../../shared/sendResponse';
 import catchAsync from '../../../shared/catchasync';
 import { DashboardService } from './dashboard.service';
-import { ICategory, ISubscriptions } from './dsashbaord.interface';
+import { IBlog, ICategory, ISubscriptions } from './dsashbaord.interface';
 import { Subscription } from './dashboard.model';
 import { IReqUser } from '../auth/auth.interface';
 
@@ -310,6 +310,95 @@ const getJobDetails = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const createJob = catchAsync(async (req: Request, res: Response) => {
+  const jobData = req.body as IBlog;
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+
+  const imageFiles = files?.image || [];
+
+  if (Array.isArray(imageFiles)) {
+    jobData.image = imageFiles.map(file => file.path);
+  }
+  const result = await DashboardService.createBlog(jobData);
+
+  sendResponse(res, {
+    statusCode: 201,
+    success: true,
+    message: 'Job created successfully',
+    data: result,
+  });
+});
+
+const updateBlog = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const updateData = req.body;
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+  const imageFiles = files?.image || [];
+
+  if (Array.isArray(imageFiles) && imageFiles.length > 0) {
+    const newImagePaths = imageFiles.map(file => file.path);
+
+    const existingImages = Array.isArray(updateData.image)
+      ? updateData.image
+      : updateData.image
+        ? [updateData.image]
+        : [];
+
+    updateData.image = [...existingImages, ...newImagePaths];
+  }
+
+  const result = await DashboardService.updateBlog(id, updateData);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Job updated successfully',
+    data: result,
+  });
+});
+
+const deleteBlog = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await DashboardService.deleteBlog(id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Job deleted successfully',
+    data: result,
+  });
+});
+
+
+const getBlogDetails = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const query = req.query;
+  const result = await DashboardService.getBlogDetails(query as any, id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Job fetched successfully',
+    data: result,
+  });
+});
+
+
+// const getAllJobs = catchAsync(async (req: Request, res: Response) => {
+//   const query = req.query;
+//   const result = await DashboardService.getAllJobs(query as any);
+
+//   sendResponse(res, {
+//     statusCode: 200,
+//     success: true,
+//     message: 'Jobs fetched successfully',
+//     data: result,
+//   });
+// });
+
+
+
 export const DashboardController = {
   getAllUser,
   createSubscriptions,
@@ -336,5 +425,9 @@ export const DashboardController = {
   getAllCandidate,
   getCandidateDetails,
   getAllJobs,
-  getJobDetails
+  getJobDetails,
+  createJob,
+  updateBlog,
+  deleteBlog,
+  getBlogDetails
 };

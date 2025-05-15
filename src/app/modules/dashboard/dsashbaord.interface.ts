@@ -9,6 +9,13 @@ export type ISubscriptions = {
   notice: string;
 };
 
+export type IBlog = {
+  title: string;
+  category: Types.ObjectId;
+  descriptions: string;
+  image: string[];
+};
+
 export interface INutritional {
   calories: number;
   protein: number;
