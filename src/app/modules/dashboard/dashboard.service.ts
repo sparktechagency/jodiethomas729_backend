@@ -523,6 +523,50 @@ const getCandidateDetails = async (query: any, userId: any) => {
 
 };
 
+const getAllJobs = async (query: any) => {
+
+    if (query?.searchTerm) {
+        delete query.page;
+    }
+
+    const jobsQuery = new QueryBuilder(Jobs.find()
+        , query)
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
+
+    const result = await jobsQuery.modelQuery;
+    const meta = await jobsQuery.countTotal();
+
+    console.log(result)
+
+    return { result, meta };
+}
+
+const getJobDetails = async (query: any, jobId: any) => {
+
+    if (query?.searchTerm) {
+        delete query.page;
+    }
+
+    const jobDetails = await Jobs.findById(jobId)
+    // query.userId = userId
+
+    const userQuery = new QueryBuilder(Applications.find({ jobId })
+        .populate("userId")
+        , query)
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
+
+    const result = await userQuery?.modelQuery;
+    const meta = await userQuery?.countTotal();
+
+    return { jobDetails, result, meta };
+};
+
 export const DashboardService = {
     totalCount,
     getAllUser,
@@ -546,5 +590,7 @@ export const DashboardService = {
     getAllEmployer,
     getEmployerDetails,
     getAllCandidate,
-    getCandidateDetails
+    getCandidateDetails,
+    getAllJobs,
+    getJobDetails
 };

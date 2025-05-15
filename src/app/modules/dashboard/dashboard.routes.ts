@@ -88,8 +88,17 @@ router.get(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   DashboardController.getCandidateDetails,
 );
-
-
+// =============================
+router.get(
+  '/get_all',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.getAllJobs,
+);
+router.get(
+  '/get_details/:jobId',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.getJobDetails,
+);
 
 
 

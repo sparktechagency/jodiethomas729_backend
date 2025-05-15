@@ -287,7 +287,28 @@ const getCandidateDetails = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+const getAllJobs = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query;
+  const result = await DashboardService.getAllJobs(query as any);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successful',
+    data: result,
+  });
+});
 
+const getJobDetails = catchAsync(async (req: Request, res: Response) => {
+  const jobId = req.params.jobId;
+  const query = req.query;
+  const result = await DashboardService.getJobDetails(query as any, jobId as any);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successful',
+    data: result,
+  });
+});
 
 export const DashboardController = {
   getAllUser,
@@ -313,5 +334,7 @@ export const DashboardController = {
   getAllEmployer,
   getEmployerDetails,
   getAllCandidate,
-  getCandidateDetails
+  getCandidateDetails,
+  getAllJobs,
+  getJobDetails
 };
