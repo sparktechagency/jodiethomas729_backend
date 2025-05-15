@@ -8,6 +8,8 @@ import { Transaction } from "../payment/payment.model";
 import Employer from "../employer/employer.model";
 import { IReqUser } from "../auth/auth.interface";
 import { ENUM_USER_ROLE } from "../../../enums/user";
+import { Jobs } from "../jobs/jobs.model";
+import Auth from "../auth/auth.model";
 
 // ===========================================
 const getYearRange = (year: any) => {
@@ -28,12 +30,14 @@ const totalCount = async () => {
     ]);
 
     const totalUsers = await User.countDocuments();
-    // const totalRecipe = await Recipe.countDocuments();
+    const totalEmployer = await Employer.countDocuments();
+    const totalJobs = await Jobs.countDocuments();
 
     return {
         totalIncome: totalIncome.length > 0 ? totalIncome[0].total : 0,
         totalUsers,
-        // totalRecipe
+        totalEmployer,
+        totalJobs
     };
 };
 
@@ -110,14 +114,14 @@ const getMonthlySubscriptionGrowth = async (year?: number) => {
     }
 };
 
-const getMonthlyUserGrowth = async (year?: number) => {
+const getMonthlyJobsGrowth = async (year?: number) => {
     try {
         const currentYear = new Date().getFullYear();
         const selectedYear = year || currentYear;
 
         const { startDate, endDate } = getYearRange(selectedYear);
 
-        const monthlyUserGrowth = await User.aggregate([
+        const monthlyUserGrowth = await Jobs.aggregate([
             {
                 $match: {
                     createdAt: {
@@ -415,13 +419,55 @@ const getAboutUs = async () => {
     return await AboutUs.findOne();
 };
 
-const allCategoryWithJobs = async (query: Record<string, unknown>) => {
-    const category = await Category.find()
+const getAllEmployer = async (query: any) => {
 
+    if (query?.searchTerm) {
+        delete query.page;
+    }
 
-    return {
-    };
+    const userQuery = new QueryBuilder(Employer.find()
+        , query)
+        .search(["name", "email"])
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
+
+    const result = await userQuery.modelQuery;
+    const meta = await userQuery.countTotal();
+
+    console.log(result)
+
+    return { result, meta };
 };
+
+const getEmployerDetails = async (query: any, userId: any) => {
+
+    if (query?.searchTerm) {
+        delete query.page;
+    }
+
+    const employer = await Employer.findById(userId)
+
+
+    // query.userId = userId
+
+    const userQuery = new QueryBuilder(Jobs.find({ userId })
+        , query)
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
+
+    const result = await userQuery?.modelQuery;
+    const meta = await userQuery?.countTotal();
+
+    console.log(result)
+
+    return { employer, result, meta };
+
+};
+
 
 export const DashboardService = {
     totalCount,
@@ -437,10 +483,12 @@ export const DashboardService = {
     addPrivacyPolicy,
     getPrivacyPolicy,
     getMonthlySubscriptionGrowth,
-    getMonthlyUserGrowth,
+    getMonthlyJobsGrowth,
     deleteSubscription,
     getAboutUs,
     addAboutUs,
     getAllSubscriber,
-    checkActiveSubscriber
+    checkActiveSubscriber,
+    getAllEmployer,
+    getEmployerDetails
 };

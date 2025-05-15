@@ -35,9 +35,9 @@ router.patch('/toggle_favorite/:jobId',
     auth(ENUM_USER_ROLE.USER),
     JobsController.toggleFavorite
 );
-router.get('/get_user_favorites',
+router.get('/get_user_favorites_jobs',
     auth(ENUM_USER_ROLE.USER),
-    JobsController.getUserFavorites
+    JobsController.getUserFavoritesJobs
 );
 router.get('/candidate_overview',
     auth(ENUM_USER_ROLE.USER),
@@ -78,7 +78,15 @@ router.get('/get_user_profile_details/:userId',
     auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
     JobsController.getUserProfileDetails
 );
+router.patch('/toggle_user_favorite/:userId',
+    auth(ENUM_USER_ROLE.EMPLOYER),
+    JobsController.toggleUserFavorite
+);
 
+router.get('/get_favorites_user_list',
+    auth(ENUM_USER_ROLE.EMPLOYER),
+    JobsController.getUserFavoriteList
+);
 
 // =============================================
 

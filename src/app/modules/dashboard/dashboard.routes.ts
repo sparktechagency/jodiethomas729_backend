@@ -15,9 +15,9 @@ router.get('/get_subscription_growth',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   DashboardController.getMonthlySubscriptionGrowth,
 );
-router.get('/get_user_growth',
+router.get('/get_job_growth',
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  DashboardController.getMonthlyUserGrowth,
+  DashboardController.getMonthlyJobsGrowth,
 );
 
 // =============================
@@ -67,16 +67,16 @@ router.delete(
 );
 
 // =========================================
-// router.get(
-//   '/all_employear',
-//   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-//   DashboardController.allCategory,
-// );
-// router.get(
-//   '/employear_details/:authId',
-//   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-//   DashboardController.allCategory,
-// );
+router.get(
+  '/all_employer',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.getAllEmployer,
+);
+router.get(
+  '/employer_details/:userId',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.getEmployerDetails,
+);
 // router.get(
 //   '/employear_job_post/:authId',
 //   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),

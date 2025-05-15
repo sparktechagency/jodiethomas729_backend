@@ -123,9 +123,9 @@ const toggleFavorite = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
-const getUserFavorites = catchAsync(async (req: Request, res: Response) => {
+const getUserFavoritesJobs = catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IReqUser;
-    const result = await JobsServices.getUserFavorites(user);
+    const result = await JobsServices.getUserFavoritesJobs(user);
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -248,6 +248,33 @@ const getUserProfileDetails = catchAsync(async (req: Request, res: Response) => 
     });
 });
 
+
+const toggleUserFavorite = catchAsync(async (req: Request, res: Response) => {
+    const { authId } = req.user as IReqUser;
+    const userId = req.params.userId;
+    const result = await JobsServices.toggleUserFavorite(authId as any, userId as any);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: result.message,
+        data: result,
+    });
+});
+
+const getUserFavoriteList = catchAsync(async (req: Request, res: Response) => {
+    const { authId } = req.user as IReqUser;
+    const query = req.query;
+    const result = await JobsServices.getUserFavoriteList(authId as any, query as any);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Get Successfully",
+        data: result,
+    });
+});
+
+
+
 export const JobsController = {
     createNewJobs,
     updateJobs,
@@ -258,7 +285,7 @@ export const JobsController = {
     makeExpireJobs,
     getAllApplyCandidate,
     toggleFavorite,
-    getUserFavorites,
+    getUserFavoritesJobs,
     getCandidateOverview,
     getCandidateJobAlert,
     allCategoryWithJobs,
@@ -268,5 +295,7 @@ export const JobsController = {
     searchCandidate,
     profileAccessRequest,
     acceptAccessRequest,
-    getUserProfileDetails
+    getUserProfileDetails,
+    toggleUserFavorite,
+    getUserFavoriteList
 }

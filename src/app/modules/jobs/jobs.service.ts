@@ -267,7 +267,7 @@ const addRemoveFavorites = async (authId: Schema.Types.ObjectId, jobId: Types.Ob
     return { message: isFavorites ? "Removed from favorites" : "Added to favorites" };
 };
 
-const getUserFavorites = async (user: IReqUser) => {
+const getUserFavoritesJobs = async (user: IReqUser) => {
     const authId = user.authId;
 
     const jobs = await Jobs.find({ favorite: { $in: [authId] } })
@@ -544,7 +544,7 @@ const getJobsDetailsForCandidate = async (jobId: any) => {
 // ==========================================
 const searchCandidate = async (user: IReqUser, query: any) => {
     const { page = 1, limit = 10, education, experience, category } = query;
-    const { userId } = user;
+    const { userId, authId } = user;
     const filter: any = {};
     const parseArray = (value: any) => {
         try {
@@ -570,14 +570,11 @@ const searchCandidate = async (user: IReqUser, query: any) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const users = await User.find(filter).lean()
-
-        .select('name email profile_image skill details permanent_address present_address profile_private profile_access')
+        .select('name email profile_image skill details permanent_address present_address profile_private profile_access favorite')
         .skip(skip)
         .limit(parseInt(limit));
 
-
-
-    const result = users.map((u: any) => {
+    let result = users.map((u: any) => {
         const hasAccess = u.profile_access?.some((entry: any) =>
             entry.eId?.toString() === userId && entry.access === true
         );
@@ -587,6 +584,18 @@ const searchCandidate = async (user: IReqUser, query: any) => {
         delete u.profile_access;
         return u;
     });
+
+    if (result?.length && authId) {
+        // @ts-ignore
+        result = result?.map((user: any) => {
+            const isFavorite = Array.isArray(user.favorite) && user.favorite.some((id: any) => id.toString() === authId.toString());
+            const { favorite, ...jobWithoutFavorite } = user;
+            return {
+                ...jobWithoutFavorite,
+                isFavorite,
+            };
+        });
+    }
 
 
     const total = await User.countDocuments(filter);
@@ -741,6 +750,53 @@ const getUserProfileDetails = async (user: IReqUser, userId: any) => {
     };
 };
 
+const toggleUserFavorite = async (authId: Schema.Types.ObjectId, userId: Types.ObjectId) => {
+    const user = await User.findById(userId);
+    if (!user) {
+        throw new ApiError(404, "Job not found");
+    }
+    // @ts-ignore
+    const isFavorites = user.favorite.includes(authId);
+    if (isFavorites) {
+        user.favorite = user.favorite.filter(id => id.toString() !== authId.toString());
+    } else {
+        // @ts-ignore
+        user.favorite.push(authId);
+    }
+    await user.save();
+
+    return { message: isFavorites ? "Removed from favorites" : "Added to favorites" };
+};
+
+const getUserFavoriteList = async (authId: any, query: any) => {
+    const { page = 1, limit = 10 } = query;
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const [result, total] = await Promise.all([
+        User.find({ favorite: { $in: [authId] } })
+            .select('name email profile_image skill details permanent_address present_address profile_private')
+            .skip(skip)
+            .limit(parseInt(limit))
+            .lean(),
+
+        User.countDocuments({ favorite: { $in: [authId] } })
+    ]);
+
+    const updatedUser = result.map(user => ({
+        ...user,
+        isFavorite: true
+    }));
+
+    const meta = {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPage: Math.ceil(total / limit)
+    };
+
+    return { users: updatedUser, meta };
+};
 
 export const JobsServices = {
     createNewJob,
@@ -752,7 +808,7 @@ export const JobsServices = {
     makeExpireJobs,
     getAllApplyCandidate,
     addRemoveFavorites,
-    getUserFavorites,
+    getUserFavoritesJobs,
     getCandidateOverview,
     getCandidateJobAlert,
     allCategoryWithJobs,
@@ -762,5 +818,7 @@ export const JobsServices = {
     searchCandidate,
     profileAccessRequest,
     acceptAccessRequest,
-    getUserProfileDetails
+    getUserProfileDetails,
+    toggleUserFavorite,
+    getUserFavoriteList
 }

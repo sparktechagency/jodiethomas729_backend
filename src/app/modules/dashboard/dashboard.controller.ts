@@ -33,12 +33,12 @@ const getMonthlySubscriptionGrowth: RequestHandler = catchAsync(
   },
 );
 
-const getMonthlyUserGrowth: RequestHandler = catchAsync(
+const getMonthlyJobsGrowth: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
     const year = req.query.year
       ? parseInt(req.query.year as string, 10)
       : undefined;
-    const result = await DashboardService.getMonthlyUserGrowth(year);
+    const result = await DashboardService.getMonthlyJobsGrowth(year);
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -239,6 +239,30 @@ const checkActiveSubscriber = catchAsync(async (req: Request, res: Response) => 
     data: result,
   });
 });
+// ===================================
+const getAllEmployer = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query
+  const result = await DashboardService.getAllEmployer(query as any);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successful',
+    data: result,
+  });
+});
+
+const getEmployerDetails = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+  const query = req.query;
+  const result = await DashboardService.getEmployerDetails(query, userId as any);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successful',
+    data: result,
+  });
+});
+
 
 
 export const DashboardController = {
@@ -257,9 +281,11 @@ export const DashboardController = {
   getPrivacyPolicy,
   totalCount,
   getMonthlySubscriptionGrowth,
-  getMonthlyUserGrowth,
+  getMonthlyJobsGrowth,
   addAboutUs,
   getAboutUs,
   getAllSubscriber,
-  checkActiveSubscriber
+  checkActiveSubscriber,
+  getAllEmployer,
+  getEmployerDetails
 };
