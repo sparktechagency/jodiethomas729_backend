@@ -120,12 +120,18 @@ router.delete(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   DashboardController.deleteBlog
 );
-
 router.get(
   '/get_blog_details/:id',
   DashboardController.getBlogDetails
 );
-
+router.get(
+  '/get_all_blogs',
+  DashboardController.getAllBlogs
+);
+router.get(
+  '/blog_details/:id',
+  DashboardController.getBlogDetailsAndRelated
+);
 // ==========================
 router.post('/addupdate-termsConditions',
   DashboardController.addTermsConditions,

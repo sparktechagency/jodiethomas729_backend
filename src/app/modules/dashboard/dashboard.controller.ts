@@ -385,19 +385,29 @@ const getBlogDetails = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-// const getAllJobs = catchAsync(async (req: Request, res: Response) => {
-//   const query = req.query;
-//   const result = await DashboardService.getAllJobs(query as any);
+const getAllBlogs = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query;
+  const result = await DashboardService.getAllBlogs(query as any);
 
-//   sendResponse(res, {
-//     statusCode: 200,
-//     success: true,
-//     message: 'Jobs fetched successfully',
-//     data: result,
-//   });
-// });
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Jobs get successfully',
+    data: result,
+  });
+});
 
+const getBlogDetailsAndRelated = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await DashboardService.getBlogDetailsAndRelated(id as any);
 
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Job details get successfully',
+    data: result,
+  });
+});
 
 export const DashboardController = {
   getAllUser,
@@ -429,5 +439,7 @@ export const DashboardController = {
   createJob,
   updateBlog,
   deleteBlog,
-  getBlogDetails
+  getBlogDetails,
+  getAllBlogs,
+  getBlogDetailsAndRelated
 };

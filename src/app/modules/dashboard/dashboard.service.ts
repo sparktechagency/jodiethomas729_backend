@@ -596,7 +596,70 @@ const getBlogDetails = async (query: any, id: string) => {
 
     return blog;
 };
+// =================================
+const getAllBlogs = async (query: any) => {
+    let { category, page = 1, limit = 10 } = query;
+    const filter: any = {};
 
+    if (category) {
+        try {
+            category = JSON.parse(category);
+        } catch {
+            if (typeof category === 'string') {
+                category = category.split(',');
+            }
+        }
+
+        if (Array.isArray(category) && category.length > 0) {
+            filter.category = { $in: category };
+        }
+    }
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const blogs = await Blogs.find(filter)
+        .populate('category')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .lean();
+
+    const total = await Blogs.countDocuments(filter);
+
+    const meta = {
+        total,
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalPage: Math.ceil(total / limit),
+    };
+
+    return {
+        meta,
+        data: blogs,
+    };
+};
+
+const getBlogDetailsAndRelated = async (id: string) => {
+    console.log('========', id)
+    const blog = await Blogs.findById(id)
+        .populate('category')
+        .lean();
+
+    if (!blog) {
+        throw new Error('Blog not found');
+    }
+    const relatedBlogs = await Blogs.find({
+        category: blog?.category?._id,
+    })
+        .sort({ createdAt: -1 })
+        .limit(6)
+        .lean();
+
+    return {
+        blog,
+        relatedBlogs,
+    };
+};
 
 export const DashboardService = {
     totalCount,
@@ -627,5 +690,7 @@ export const DashboardService = {
     createBlog,
     updateBlog,
     deleteBlog,
-    getBlogDetails
+    getBlogDetails,
+    getAllBlogs,
+    getBlogDetailsAndRelated
 };
