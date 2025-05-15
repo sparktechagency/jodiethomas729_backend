@@ -8,7 +8,7 @@ import { Transaction } from "../payment/payment.model";
 import Employer from "../employer/employer.model";
 import { IReqUser } from "../auth/auth.interface";
 import { ENUM_USER_ROLE } from "../../../enums/user";
-import { Jobs } from "../jobs/jobs.model";
+import { Applications, Jobs } from "../jobs/jobs.model";
 import Auth from "../auth/auth.model";
 
 // ===========================================
@@ -468,6 +468,60 @@ const getEmployerDetails = async (query: any, userId: any) => {
 
 };
 
+const getAllCandidate = async (query: any) => {
+
+    if (query?.searchTerm) {
+        delete query.page;
+    }
+
+    const userQuery = new QueryBuilder(
+        // @ts-ignore
+        User.find().select('-profile_access -favorite'),
+        query
+    )
+
+        .search(["name", "email"])
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
+
+    const result = await userQuery.modelQuery;
+    const meta = await userQuery.countTotal();
+
+    console.log(result)
+
+    return { result, meta };
+};
+
+
+const getCandidateDetails = async (query: any, userId: any) => {
+
+    if (query?.searchTerm) {
+        delete query.page;
+    }
+
+    const userDetails = await User.findById(userId)
+
+
+    // query.userId = userId
+
+    const userQuery = new QueryBuilder(Applications.find({ userId })
+        .populate("jobId")
+        , query)
+        .filter()
+        .sort()
+        .paginate()
+        .fields()
+
+    const result = await userQuery?.modelQuery;
+    const meta = await userQuery?.countTotal();
+
+    console.log(result)
+
+    return { userDetails, result, meta };
+
+};
 
 export const DashboardService = {
     totalCount,
@@ -490,5 +544,7 @@ export const DashboardService = {
     getAllSubscriber,
     checkActiveSubscriber,
     getAllEmployer,
-    getEmployerDetails
+    getEmployerDetails,
+    getAllCandidate,
+    getCandidateDetails
 };

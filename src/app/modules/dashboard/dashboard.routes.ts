@@ -77,6 +77,22 @@ router.get(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   DashboardController.getEmployerDetails,
 );
+// =============
+router.get(
+  '/all_candidate',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.getAllCandidate,
+);
+router.get(
+  '/candidate_details/:userId',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.getCandidateDetails,
+);
+
+
+
+
+
 // router.get(
 //   '/employear_job_post/:authId',
 //   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),

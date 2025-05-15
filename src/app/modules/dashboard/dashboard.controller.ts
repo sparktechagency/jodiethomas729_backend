@@ -262,6 +262,30 @@ const getEmployerDetails = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+// =======================
+const getAllCandidate = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query
+  const result = await DashboardService.getAllCandidate(query as any);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successful',
+    data: result,
+  });
+});
+
+const getCandidateDetails = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+  const query = req.query;
+  const result = await DashboardService.getCandidateDetails(query as any, userId as any);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successful',
+    data: result,
+  });
+});
+
 
 
 
@@ -287,5 +311,7 @@ export const DashboardController = {
   getAllSubscriber,
   checkActiveSubscriber,
   getAllEmployer,
-  getEmployerDetails
+  getEmployerDetails,
+  getAllCandidate,
+  getCandidateDetails
 };
