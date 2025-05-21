@@ -45,7 +45,7 @@ const WorkExSchema = new Schema<IWorkExperience>({
     type: String,
     required: true,
   },
-  from_date: {
+  end_date: {
     type: String,
     required: true,
   },

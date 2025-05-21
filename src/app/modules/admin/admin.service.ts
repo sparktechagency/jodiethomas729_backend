@@ -57,25 +57,6 @@ const updateProfile = async (req: IRequest): Promise<IAdmin | null> => {
   return updateUser;
 };
 
-const deleteMyAccount = async (payload: { email: string; password: string }): Promise<void> => {
-  const { email, password } = payload;
-
-  const isUserExist = await Auth.isAuthExist(email);
-  if (!isUserExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User does not exist");
-  }
-
-  if (
-    isUserExist.password &&
-    !(await Auth.isPasswordMatched(password, isUserExist.password))
-  ) {
-    throw new ApiError(httpStatus.PAYMENT_REQUIRED, "Password is incorrect");
-  }
-
-  await Admin.deleteOne({ authId: isUserExist._id });
-  await Auth.deleteOne({ email });
-};
-
 const getAllAdmin = async () => {
   const admins = await Admin.find().lean();
   return admins.map((admin) => ({
@@ -117,7 +98,6 @@ const deleteAuthAccount = async (user: IReqUser, email: string) => {
 
 export const AdminService = {
   updateProfile,
-  deleteMyAccount,
   getAllAdmin,
   deleteAuthAccount
 };

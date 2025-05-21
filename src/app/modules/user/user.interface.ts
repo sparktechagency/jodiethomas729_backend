@@ -49,7 +49,7 @@ export interface IWorkExperience {
   job_title: string;
   company_name: string;
   location: string;
-  from_date: string;
+  end_date: string;
   start_date: string;
   details: string;
 }

@@ -14,17 +14,6 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const deleteMyAccount = catchAsync(async (req: Request, res: Response) => {
-  const email = req.params.email
-  const result = await AdminService.deleteMyAccount(email as any);
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "Your admin account deleted successfully.",
-    data: result,
-  });
-});
-
 
 const getAllAdmin = catchAsync(async (req: Request, res: Response) => {
   const result = await AdminService.getAllAdmin();
@@ -55,7 +44,6 @@ const deleteAuthAccount = catchAsync(async (req: Request, res: Response) => {
 
 export const AdminController = {
   updateProfile,
-  deleteMyAccount,
   getAllAdmin,
   deleteAuthAccount
 };

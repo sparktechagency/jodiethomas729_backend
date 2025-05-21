@@ -605,10 +605,6 @@ const myProfile = async (user: { userId: string, role: string }) => {
     default:
       throw new ApiError(400, "Invalid role provided!");
   }
-
-  console.log("===========", result)
-
-
   return result;
 };
 

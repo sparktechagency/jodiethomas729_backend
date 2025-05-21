@@ -586,7 +586,6 @@ const searchCandidate = async (user: IReqUser, query: any) => {
     });
 
     if (result?.length && authId) {
-        // @ts-ignore
         result = result?.map((user: any) => {
             const isFavorite = Array.isArray(user.favorite) && user.favorite.some((id: any) => id.toString() === authId.toString());
             const { favorite, ...jobWithoutFavorite } = user;
@@ -753,7 +752,7 @@ const getUserProfileDetails = async (user: IReqUser, userId: any) => {
 const toggleUserFavorite = async (authId: Schema.Types.ObjectId, userId: Types.ObjectId) => {
     const user = await User.findById(userId);
     if (!user) {
-        throw new ApiError(404, "Job not found");
+        throw new ApiError(404, "User not found");
     }
     // @ts-ignore
     const isFavorites = user.favorite.includes(authId);
@@ -797,6 +796,7 @@ const getUserFavoriteList = async (authId: any, query: any) => {
 
     return { users: updatedUser, meta };
 };
+
 
 export const JobsServices = {
     createNewJob,

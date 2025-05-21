@@ -55,12 +55,6 @@ router.patch(
   AdminController.updateProfile
 );
 router.delete(
-  "/delete-account",
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  AdminController.deleteMyAccount
-);
-
-router.delete(
   "/delete-auth-account",
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   AdminController.deleteAuthAccount

@@ -73,7 +73,6 @@ router.patch('/accept_access_request/:employerId',
     auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
     JobsController.acceptAccessRequest
 );
-
 router.get('/get_user_profile_details/:userId',
     auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
     JobsController.getUserProfileDetails
@@ -82,12 +81,10 @@ router.patch('/toggle_user_favorite/:userId',
     auth(ENUM_USER_ROLE.EMPLOYER),
     JobsController.toggleUserFavorite
 );
-
 router.get('/get_favorites_user_list',
     auth(ENUM_USER_ROLE.EMPLOYER),
     JobsController.getUserFavoriteList
 );
-
 // =============================================
 
 

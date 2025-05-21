@@ -274,7 +274,6 @@ const getUserFavoriteList = catchAsync(async (req: Request, res: Response) => {
 });
 
 
-
 export const JobsController = {
     createNewJobs,
     updateJobs,
