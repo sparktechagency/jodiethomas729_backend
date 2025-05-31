@@ -22,8 +22,32 @@ const deleteMyAccount = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const addWorkExperience = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.addWorkExperience(req as any);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Add successfully.",
+    data: result,
+  });
+});
+
+const removeWorkExperience = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.removeWorkExperience(req as any);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Delete successfully.",
+    data: result,
+  });
+});
+
+
+
 export const UserController = {
   deleteMyAccount,
   updateProfile,
+  addWorkExperience,
+  removeWorkExperience
 };
 

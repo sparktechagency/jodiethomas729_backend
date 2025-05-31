@@ -56,4 +56,5 @@ export interface IWorkExperience {
   end_date: string;
   start_date: string;
   details: string;
+  currently_work: boolean
 }

@@ -42,17 +42,17 @@ const updateMyProfile = async (req: RequestData): Promise<IUser> => {
   if (data?.alert_job_type) {
     data.alert_job_type = JSON.parse(data?.alert_job_type);
   }
-  if (data?.types) {
+  if (data?.availability) {
     data.types = JSON.parse(data?.types);
   }
   if (data?.skill) {
     data.skill = JSON.parse(data?.skill);
   }
-  if (data?.curricular_activities) {
-    data.curricular_activities = JSON.parse(data?.curricular_activities);
+  if (data?.job_title) {
+    data.job_title = JSON.parse(data?.job_title);
   }
-  if (data?.hobbies) {
-    data.hobbies = JSON.parse(data?.hobbies);
+  if (data?.job_seeking) {
+    data.job_seeking = JSON.parse(data?.job_seeking);
   }
 
   const updatedData = { ...data };
@@ -77,6 +77,46 @@ const updateMyProfile = async (req: RequestData): Promise<IUser> => {
   return updateUser as IUser;
 };
 
+const addWorkExperience = async (req: RequestData) => {
+  const { body: newExperience } = req as any;
+  const { userId } = req.user;
+
+  const checkUser = await User.findById(userId);
+  if (!checkUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+  }
+
+  const requiredFields = [
+    "job_title",
+    "company_name",
+    "location",
+    "start_date",
+    "end_date",
+    "details"
+  ];
+
+  for (const field of requiredFields) {
+    if (!newExperience[field]) {
+      throw new ApiError(httpStatus.BAD_REQUEST, `${field} is required.`);
+    }
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      $push: {
+        work_experience: newExperience,
+      },
+    },
+    {
+      new: true,
+    }
+  ).populate("authId");
+
+  return { result: updatedUser?.work_experience }
+};
+
+
 const deleteUSerAccount = async (payload: { email: string; password: string; }): Promise<void> => {
   const { email, password } = payload;
 
@@ -96,8 +136,37 @@ const deleteUSerAccount = async (payload: { email: string; password: string; }):
   await Auth.deleteOne({ email });
 };
 
+const removeWorkExperience = async (req: RequestData) => {
+  const { userId } = req.user;
+  const { experienceId } = req.params as any;
+
+  if (!experienceId) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Experience ID is required.");
+  }
+
+  const checkUser = await User.findById(userId);
+  if (!checkUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      $pull: {
+        work_experience: { _id: experienceId },
+      },
+    },
+    { new: true }
+  ).populate("authId");
+
+  return { result: updatedUser?.work_experience }
+};
+
+
 export const UserService = {
   deleteUSerAccount,
   updateMyProfile,
+  addWorkExperience,
+  removeWorkExperience
 };
 

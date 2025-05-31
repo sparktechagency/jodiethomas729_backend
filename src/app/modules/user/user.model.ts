@@ -65,6 +65,10 @@ const WorkExSchema = new Schema<IWorkExperience>({
     type: String,
     required: true,
   },
+  currently_work: {
+    type: Boolean,
+    default: false
+  },
   details: {
     type: String,
     required: true,

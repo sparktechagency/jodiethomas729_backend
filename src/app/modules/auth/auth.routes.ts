@@ -25,13 +25,15 @@ router.patch("/change-password",
     ENUM_USER_ROLE.ADMIN,
     ENUM_USER_ROLE.SUPER_ADMIN
   ),
-  AuthController.changePassword)
-router.delete("/delete-account", AuthController.deleteMyAccount)
-router.patch("/block", AuthController.blockUnblockAuthUser)
+  AuthController.changePassword);
+router.delete("/delete-account", AuthController.deleteMyAccount);
+router.patch("/block",
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  AuthController.blockUnblockAuthUser);
+
 router.get("/profile",
   auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
-  AuthController.myProfile
-);
+  AuthController.myProfile);
 
 //------ User Router --------------- 
 router.patch(
@@ -75,8 +77,16 @@ router.get(
 router.get(
   "/employer/profile_incomplete_parent",
   auth(ENUM_USER_ROLE.EMPLOYER),
-  EmployerController.getProfileIncompleteParent
-);
+  EmployerController.getProfileIncompleteParent);
+
+router.patch(
+  "/add_work_experience",
+  auth(ENUM_USER_ROLE.USER),
+  UserController.addWorkExperience);
+router.patch(
+  "/remove_work_experience/:experienceId",
+  auth(ENUM_USER_ROLE.USER),
+  UserController.removeWorkExperience);
 
 
 
