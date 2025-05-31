@@ -273,6 +273,17 @@ const getUserFavoriteList = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getTotalCountEmployer = catchAsync(async (req: Request, res: Response) => {
+    const query = req.query;
+    const result = await JobsServices.getTotalCountEmployer(req.user as any);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Get Successfully",
+        data: result,
+    });
+});
+
 
 export const JobsController = {
     createNewJobs,
@@ -296,5 +307,6 @@ export const JobsController = {
     acceptAccessRequest,
     getUserProfileDetails,
     toggleUserFavorite,
-    getUserFavoriteList
+    getUserFavoriteList,
+    getTotalCountEmployer
 }

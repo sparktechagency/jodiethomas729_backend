@@ -271,6 +271,7 @@ const forgotPass = async (payload: { email: string }) => {
 };
 
 const checkIsValidForgetActivationCode = async (payload: { email: string; code: string }) => {
+  console.log("=email", payload)
 
   const account: any = await Auth.findOne({ email: payload.email }) as IAuth;
   if (!account) {
@@ -297,10 +298,12 @@ const checkIsValidForgetActivationCode = async (payload: { email: string; code: 
 const resetPassword = async (req: { query: { email: string }; body: ResetPasswordPayload }) => {
   const { email } = req.query;
   const { newPassword, confirmPassword } = req.body;
+  console.log("=email", email, newPassword, confirmPassword)
 
   if (newPassword !== confirmPassword) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Passwords do not match");
   }
+
 
   const auth = await Auth.findOne({ email }, { _id: 1, codeVerify: 1 });
   if (!auth) {
@@ -330,6 +333,7 @@ const changePassword = async (user: { authId: string }, payload: ChangePasswordP
   if (newPassword !== confirmPassword) {
     throw new ApiError(httpStatus.BAD_REQUEST, "Password and confirm password do not match");
   }
+  console.log("=payload", user, payload)
   const isUserExist = await Auth.findById(authId).select("+password");
   if (!isUserExist) {
     throw new ApiError(404, "Account does not exist!");

@@ -19,7 +19,6 @@ const storage = new CloudinaryStorage({
     },
 });
 
-// No fileFilter and no allowed_formats - this allows all file types
 const uploadC = multer({
     storage,
 });

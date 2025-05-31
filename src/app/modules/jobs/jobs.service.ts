@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types } from "mongoose";
+import { Schema, Types } from "mongoose";
 import QueryBuilder from "../../../builder/QueryBuilder";
 import { IReqUser } from "../auth/auth.interface";
 import { IApplications, IJobs } from "./jobs.interface";
@@ -9,20 +9,26 @@ import ApiError from "../../../errors/ApiError";
 import User from "../user/user.model";
 import { Category } from "../dashboard/dashboard.model";
 import Notification from "../notifications/notifications.model";
-import { IUser } from "../user/user.interface";
 
 // ======================================
 const createNewJob = async (user: IReqUser, payload: IJobs) => {
     const { authId, userId } = user;
     try {
+
         const parsedData = jobValidationSchema.parse(payload);
+
+        const locations = {
+            type: 'Point',
+            coordinates: [parsedData.location.longitude, parsedData.location.latitude],
+        };
 
         const jobData = {
             ...parsedData,
             authId: new Types.ObjectId(authId),
             userId: new Types.ObjectId(userId),
+            locations,
         };
-
+        // console.log('payload', jobData, authId)
         const job = new Jobs(jobData);
         await job.save();
 
@@ -32,6 +38,7 @@ const createNewJob = async (user: IReqUser, payload: IJobs) => {
         return job;
 
     } catch (error: any) {
+        console.log("payload", error)
         if (error.name === 'ZodError') {
             throw new AppError(404, 'Job creation failed: ' + error.errors.map((e: any) => e.message).join(', '));
         }
@@ -78,10 +85,20 @@ const updateJobs = async (jobId: string, payload: Partial<IJobs>) => {
             throw new Error('Job not found or unauthorized');
         }
 
+        if (parsedData.location && parsedData.location.longitude && parsedData.location.latitude) {
+            // @ts-ignore
+            parsedData.locations = {
+                type: 'Point',
+                coordinates: [
+                    parsedData.location.longitude,
+                    parsedData.location.latitude,
+                ],
+            };
+        }
+
+        delete (parsedData as any).location;
         Object.assign(job, parsedData);
         await job.save();
-
-        console.log("==============", job)
 
         return job;
 
@@ -372,14 +389,16 @@ const allCategoryWithJobs = async () => {
 const getRecentJobs = async (query: any) => {
     const { authId } = query;
 
-    console.log("authId", authId)
+
     if (authId) {
         delete query.authId
     }
 
     const transitionQuery = new QueryBuilder(
         // @ts-ignore
-        Jobs.find().select("title category locations types experience education createdAt userId favorite").lean(),
+        Jobs.find().select("title category salary application_dateline locations types experience education createdAt userId favorite")
+            .populate("userId")
+            .lean(),
         query
     )
         .search([])
@@ -409,8 +428,6 @@ const getRecentJobs = async (query: any) => {
             };
         });
     }
-
-
     return { result, meta };
 };
 
@@ -465,7 +482,7 @@ const getSearchFilterJobs = async (query: any) => {
 
     let [jobs, total] = await Promise.all([
         Jobs.find(filter)
-            .select("title category locations types experience education createdAt userId favorite")
+            .select("title category locations types experience education createdAt userId favorite application_dateline salary")
             .populate('category')
             .populate({
                 path: "userId",
@@ -797,6 +814,22 @@ const getUserFavoriteList = async (authId: any, query: any) => {
     return { users: updatedUser, meta };
 };
 
+const getTotalCountEmployer = async (user: IReqUser) => {
+    const { userId } = user;
+
+    const jobs = await Jobs.find({ userId }, 'applications');
+
+    const totalJobs = jobs.length;
+
+    const totalApplications = jobs.reduce((sum, job) => {
+        return sum + (job.applications?.length || 0);
+    }, 0);
+
+    return {
+        totalJobs,
+        totalApplications,
+    };
+};
 
 export const JobsServices = {
     createNewJob,
@@ -820,5 +853,6 @@ export const JobsServices = {
     acceptAccessRequest,
     getUserProfileDetails,
     toggleUserFavorite,
-    getUserFavoriteList
+    getUserFavoriteList,
+    getTotalCountEmployer
 }

@@ -8,7 +8,9 @@ export type ICompany = Document & {
   locations: string;
   service: string;
   details: string;
+  employer_position: string
   website_link: string;
+  company_logo: string
 }
 
 export type ISocialMedia = Document & {

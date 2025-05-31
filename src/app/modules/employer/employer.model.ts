@@ -9,12 +9,10 @@ const SocialMediaSchema = new Schema<ISocialMedia>({
 });
 
 const CompanySchema = new Schema<ICompany>({
+  company_logo: { type: String, required: true },
   name: { type: String, required: true },
-  email: { type: String, required: true },
-  phone: { type: String, required: true },
-  verifications_no: { type: String, required: true },
+  employer_position: { type: String, required: true },
   locations: { type: String, required: true },
-  service: { type: String, required: true },
   details: { type: String, required: true },
   website_link: { type: String, default: null },
 });
@@ -24,7 +22,6 @@ const EmployerSchema = new Schema<IEmployer>({
   name: { type: String, required: true },
   email: { type: String, required: true },
   profile_image: { type: String, default: null },
-  banner_image: { type: String, default: null },
   phone_number: { type: String, default: null },
   organization_types: { type: String, default: null },
   industry_types: { type: String, default: null },

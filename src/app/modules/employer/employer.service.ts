@@ -32,16 +32,23 @@ const updateMyProfile = async (req: RequestData): Promise<IEmployer> => {
     profile_image = `/images/profile/${files.profile_image[0].filename}`;
   }
 
-  let banner_image: string | undefined = undefined;
-  if (files && files.banner_image) {
-    banner_image = `/images/profile/${files.banner_image[0].filename}`;
+
+  if (data?.company && typeof data.company === "string") {
+    data.company = JSON.parse(data.company);
   }
 
-  if (data?.company) {
-    data.company = JSON.parse(data?.company);
+  if (data?.socialMedia && typeof data.socialMedia === "string") {
+    data.socialMedia = JSON.parse(data.socialMedia);
   }
-  if (data?.socialMedia) {
-    data.socialMedia = JSON.parse(data?.socialMedia);
+
+  if (files?.company_logo?.[0]?.filename) {
+    const companyLogoPath = `/images/image/${files.company_logo[0].filename}`;
+    if (!data?.company || typeof data.company !== "object") {
+      // @ts-ignore
+      data.company = {};
+    }
+    // @ts-ignore
+    data.company.company_logo = companyLogoPath;
   }
 
   const updatedData = { ...data };
@@ -55,7 +62,7 @@ const updateMyProfile = async (req: RequestData): Promise<IEmployer> => {
     ),
     Employer.findByIdAndUpdate(
       userId,
-      { profile_image, banner_image, ...updatedData },
+      { profile_image, ...updatedData },
       {
         new: true,
       }

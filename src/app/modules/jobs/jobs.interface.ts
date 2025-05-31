@@ -13,12 +13,15 @@ export interface IJobs extends Document {
     skill: string[];
     vacancies: number;
     application_dateline: Date;
-    locations: string
+    locations: any
     descriptions: string;
     availabilities: string;
     status: string;
     applications: Schema.Types.ObjectId[];
     favorite: Schema.Types.ObjectId[];
+    rate: string;
+    job_pattern: string;
+    address: string;
 }
 
 
@@ -27,6 +30,7 @@ export interface IApplications extends Document {
     jobId: Schema.Types.ObjectId;
     resume: string;
     cover_letter: string;
+    expected_salary: number;
 }
 
 export interface IJobAlert extends Document {

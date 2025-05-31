@@ -2,6 +2,18 @@ import mongoose, { Model, Schema } from "mongoose";
 import { IApplications, IJobAlert, IJobs } from "./jobs.interface";
 import { access } from "fs";
 
+const locationSchema = new Schema({
+    type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+    },
+    coordinates: {
+        type: [Number],
+        required: true,
+    },
+});
+
 const JobsSchema = new Schema<IJobs>(
     {
         authId: { type: Schema.Types.ObjectId, ref: 'Auth', required: true },
@@ -16,7 +28,7 @@ const JobsSchema = new Schema<IJobs>(
         experience: {
             type: String,
             required: true,
-            enum: ["freshers", "1_2_years", "2_4_years", "4_6_years", "6_8_years", "8_10_years", "10_12_years", "12_14_years", "15_years"]
+            enum: ["freshers", "1_2_years", "2_4_years", "4_6_years", "6_8_years", "8_10_years", "10plus"]
         },
         types: {
             type: String,
@@ -31,7 +43,7 @@ const JobsSchema = new Schema<IJobs>(
         skill: { type: [String] },
         vacancies: { type: Number },
         application_dateline: { type: Date },
-        locations: { type: String },
+        locations: { type: locationSchema },
         descriptions: { type: String, required: true },
         applications: {
             type: [Schema.Types.ObjectId],
@@ -49,6 +61,17 @@ const JobsSchema = new Schema<IJobs>(
             default: "Active"
         },
         availabilities: { type: String },
+        rate: {
+            type: String,
+            enum: ["par_hour", "par_day", "par_year"],
+        },
+        job_pattern: {
+            type: String,
+            enum: ["day_shift", "evening_shift", "days", "hours", "flexibility"]
+        },
+        address: { type: String, required: true },
+
+
     },
     { timestamps: true }
 );
@@ -58,6 +81,7 @@ const ApplicationsSchema = new Schema<IApplications>(
         userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         jobId: { type: Schema.Types.ObjectId, ref: 'Jobs', required: true },
         resume: { type: String, required: true },
+        expected_salary: { type: Number },
         cover_letter: { type: String, required: true },
     },
     { timestamps: true }
