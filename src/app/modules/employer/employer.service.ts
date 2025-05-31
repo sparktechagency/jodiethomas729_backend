@@ -5,6 +5,7 @@ import { RequestData } from "../../../interfaces/common";
 import Auth from "../auth/auth.model";
 import { IEmployer } from "./employer.interface";
 import Employer from "./employer.model";
+import { IReqUser } from "../auth/auth.interface";
 
 const updateMyProfile = async (req: RequestData): Promise<IEmployer> => {
   const { files, body: data } = req;
@@ -106,9 +107,50 @@ const deleteEmployerAccount = async (payload: { email: string; password: string;
   await Auth.deleteOne({ email });
 };
 
+const getProfileIncompleteParent = async (user: IReqUser) => {
+  const { userId } = user;
+
+  const employer = await Employer.findById(userId);
+  if (!employer) {
+    throw new Error("Employer not found");
+  }
+
+  // Define important profile fields
+  const profileFields = [
+    employer.name,
+    employer.email,
+    employer.phone_number,
+    employer.profile_image,
+    employer.years_of_establishment,
+    employer.company?.company_logo,
+    employer.company?.name,
+    employer.company?.employer_position,
+    employer.company?.locations,
+    employer.company?.details,
+    employer.company?.website_link,
+    employer.socialMedia?.website,
+    employer.socialMedia?.linkedin,
+    employer.socialMedia?.instagram,
+    employer.socialMedia?.facebook,
+  ];
+
+  const totalFields = profileFields.length;
+  const filledFields = profileFields.filter((field) => field !== null && field !== undefined && field !== "").length;
+
+  const completedPercent = Math.round((filledFields / totalFields) * 100);
+  const incompletePercent = 100 - completedPercent;
+
+  return {
+    completedPercent,
+    incompletePercent,
+    totalFields,
+  };
+};
+
 export const EmployerService = {
   getProfile,
   deleteEmployerAccount,
   updateMyProfile,
+  getProfileIncompleteParent
 };
 

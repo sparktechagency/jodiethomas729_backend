@@ -3,6 +3,8 @@ import mongoose, { Document } from "mongoose";
 export interface IUser extends Document {
   authId: mongoose.Types.ObjectId;
   name: string;
+  job_title: string[];
+  job_seeking: string[];
   email: string;
   profile_image?: string | null;
   phone_number?: string | null;
@@ -25,14 +27,16 @@ export interface IUser extends Document {
   subscription_status: string;
   category: mongoose.Types.ObjectId;
   experience: string;
-  types: string[];
+  availability: string[];
   education: string;
   profile_private: boolean;
+  address: string;
   profile_access: {
     eId: mongoose.Types.ObjectId;
     access: boolean;
   }[];
   favorite: mongoose.Types.ObjectId[];
+  locations: any;
 }
 
 export interface IEducational {

@@ -33,9 +33,23 @@ const deleteMyAccount = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const getProfileIncompleteParent = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const result = await EmployerService.getProfileIncompleteParent(user as IReqUser);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Get successfully!",
+    data: result
+  });
+});
+
+
 export const EmployerController = {
   deleteMyAccount,
   getProfile,
   updateProfile,
+  getProfileIncompleteParent
 };
 

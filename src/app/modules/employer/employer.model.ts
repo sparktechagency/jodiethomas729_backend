@@ -23,20 +23,13 @@ const EmployerSchema = new Schema<IEmployer>({
   email: { type: String, required: true },
   profile_image: { type: String, default: null },
   phone_number: { type: String, default: null },
-  organization_types: { type: String, default: null },
-  industry_types: { type: String, default: null },
-  team_size: { type: String, default: null },
   years_of_establishment: { type: Date, default: null },
-  isPhoneNumberVerified: { type: Boolean, default: false },
   company: { type: CompanySchema },
   socialMedia: { type: SocialMediaSchema },
   subscription_status: {
     type: String,
     enum: ["Active", "None", "Expired"],
     default: "None",
-  },
-  duration_time: {
-    type: Date,
   },
   status: {
     type: String,

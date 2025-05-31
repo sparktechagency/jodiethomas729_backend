@@ -33,12 +33,12 @@ const JobsSchema = new Schema<IJobs>(
         types: {
             type: String,
             required: true,
-            enum: ["full_time", "part_time", "internship", "remote", "temporary", "contract_base"]
+            enum: ["full_time", "part_time", "internship", "remote_hybrid", "temporary", "fixedterm_contract", "apprenticeship", "graduate_entrylevel"]
         },
         education: {
             type: String,
             required: true,
-            enum: ["high_school", "intermediate", "bachelor_degree", "graduation", "master_degree"]
+            enum: ["gcse_or_equivalent", "apprenticeship", "hnc_hnd", "degree", "other"]
         },
         skill: { type: [String] },
         vacancies: { type: Number },

@@ -20,7 +20,6 @@ export const jobValidationSchema = z.object({
         ],
         { errorMap: () => ({ message: 'Invalid experience level selected' }) }
     ),
-
     types: z.enum(
         [
             'full_time', 'part_time', 'internship',
@@ -31,10 +30,7 @@ export const jobValidationSchema = z.object({
     ),
 
     education: z.enum(
-        [
-            'high_school', 'intermediate',
-            'bachelor_degree', 'graduation', 'master_degree'
-        ],
+        ["gcse_or_equivalent", "apprenticeship", "hnc_hnd", "degree", "other"],
         { errorMap: () => ({ message: 'Invalid education level selected' }) }
     ),
 

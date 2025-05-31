@@ -72,5 +72,12 @@ router.get(
   DashboardController.checkActiveSubscriber
 );
 
+router.get(
+  "/employer/profile_incomplete_parent",
+  auth(ENUM_USER_ROLE.EMPLOYER),
+  EmployerController.getProfileIncompleteParent
+);
+
+
 
 export const AuthRoutes = router;

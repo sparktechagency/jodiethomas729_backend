@@ -831,6 +831,9 @@ const getTotalCountEmployer = async (user: IReqUser) => {
     };
 };
 
+
+
+
 export const JobsServices = {
     createNewJob,
     updateJobs,

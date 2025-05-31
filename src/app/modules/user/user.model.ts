@@ -32,6 +32,18 @@ const EducationalSchema = new Schema<IEducational>({
   },
 })
 
+const locationSchema = new Schema({
+  type: {
+    type: String,
+    enum: ["Point"],
+    default: "Point",
+  },
+  coordinates: {
+    type: [Number],
+    required: true,
+  },
+});
+
 const WorkExSchema = new Schema<IWorkExperience>({
   job_title: {
     type: String,
@@ -66,9 +78,19 @@ const UserSchema = new Schema<IUser>(
       required: true,
       ref: "Auth",
     },
+    profile_image: {
+      type: String,
+      default: null,
+    },
     name: {
       type: String,
       required: true,
+    },
+    job_title: {
+      type: [String],
+    },
+    job_seeking: {
+      type: [String],
     },
     email: {
       type: String,
@@ -80,66 +102,50 @@ const UserSchema = new Schema<IUser>(
     },
     experience: {
       type: String,
-      enum: ["freshers", "1_2_years", "2_4_years", "4_6_years", "6_8_years", "8_10_years", "10_12_years", "12_14_years", "15_years"]
+      enum: ["freshers", "1_2_years", "2_4_years", "4_6_years", "6_8_years", "8_10_years", "10plus"]
     },
-    types: {
+    availability: {
       type: [String],
-      enum: ["full_time", "part_time", "internship", "remote", "temporary", "contract_base"]
+      enum: ["full_time", "part_time", "internship", "remote_hybrid", "temporary", "fixedterm_contract", "apprenticeship", "graduate_entrylevel"]
     },
     education: {
       type: String,
-      enum: ["high_school", "intermediate", "bachelor_degree", "graduation", "master_degree"]
-    },
-    profile_private: {
-      type: Boolean,
-      default: false
-    },
-    profile_image: {
-      type: String,
-      default: null,
+      enum: ["gcse_or_equivalent", "apprenticeship", "hnc_hnd", "degree", "other"]
     },
     phone_number: {
       type: String,
       default: null,
     },
-    isPhoneNumberVerified: {
+    profile_private: {
       type: Boolean,
-      default: false,
-    },
-    nid_no: {
-      type: String,
-      default: null,
-    },
-    // gender: {
-    //   type: String,
-    //   default: null,
-    // },
-    present_address: {
-      type: String,
-      default: null,
-    },
-    permanent_address: {
-      type: String,
+      default: false
     },
     details: {
       type: String,
     },
-    educational_info: {
-      type: [EducationalSchema],
+    address: {
+      type: String,
+      default: null,
     },
+    locations: {
+      type: locationSchema,
+    },
+    // educational_info: {
+    //   type: [EducationalSchema],
+    // },
     work_experience: {
       type: [WorkExSchema]
     },
     skill: {
       type: [String],
     },
-    curricular_activities: {
-      type: [String],
-      default: 0,
-    },
-    hobbies: {
-      type: [String],
-    },
+    // curricular_activities: {
+    //   type: [String],
+    //   default: 0,
+    // },
+    // hobbies: {
+    //   type: [String],
+    // },
     alert_job_type: {
       type: [Schema.Types.ObjectId],
       ref: "Category"
@@ -160,14 +166,6 @@ const UserSchema = new Schema<IUser>(
         }
       }],
       default: []
-    },
-    duration_time: {
-      type: Date,
-    },
-    subscription_status: {
-      type: String,
-      enum: ["Active", "None", "Expired"],
-      default: "None",
     },
     status: {
       type: String,
