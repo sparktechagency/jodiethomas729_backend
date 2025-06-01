@@ -9,6 +9,8 @@ import ApiError from "../../../errors/ApiError";
 import User from "../user/user.model";
 import { Category } from "../dashboard/dashboard.model";
 import Notification from "../notifications/notifications.model";
+import { IUser } from "../user/user.interface";
+import httpStatus from "http-status";
 
 // ======================================
 const createNewJob = async (user: IReqUser, payload: IJobs) => {
@@ -72,22 +74,24 @@ const sendJobAlerts = async (job: any) => {
 };
 
 const updateJobs = async (jobId: string, payload: Partial<IJobs>) => {
-
     try {
         if (!Types.ObjectId.isValid(jobId)) {
-            throw new Error('Invalid job ID');
+            throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid job ID');
         }
 
         const parsedData = jobValidationSchema.partial().parse(payload);
 
         const job = await Jobs.findById(jobId);
         if (!job) {
-            throw new Error('Job not found or unauthorized');
+            throw new ApiError(httpStatus.NOT_FOUND, 'Job not found or unauthorized');
         }
 
-        if (parsedData.location && parsedData.location.longitude && parsedData.location.latitude) {
-            // @ts-ignore
-            parsedData.locations = {
+        if (
+            parsedData?.location &&
+            parsedData.location?.longitude != null &&
+            parsedData.location?.latitude != null
+        ) {
+            job.locations = {
                 type: 'Point',
                 coordinates: [
                     parsedData.location.longitude,
@@ -96,19 +100,24 @@ const updateJobs = async (jobId: string, payload: Partial<IJobs>) => {
             };
         }
 
+        // Remove the raw input location field (optional)
         delete (parsedData as any).location;
+
+        // Assign remaining data
         Object.assign(job, parsedData);
+
         await job.save();
 
         return job;
 
     } catch (error: any) {
         if (error.name === 'ZodError') {
-            throw new AppError(404, 'Job creation failed: ' + error.errors.map((e: any) => e.message).join(', '));
+            throw new ApiError(httpStatus.BAD_REQUEST, 'Job update failed: ' + error.errors.map((e: any) => e.message).join(', '));
         }
-        throw new AppError(404, 'Unexpected error while creating job');
+        throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, error.message || 'Unexpected error while updating job');
     }
 };
+
 
 const getEmployerJobs = async (user: IReqUser, query: any) => {
     const { page, limit } = query;
@@ -431,22 +440,150 @@ const getRecentJobs = async (query: any) => {
     return { result, meta };
 };
 
-const getSearchFilterJobs = async (query: any) => {
-    let {
-        experience,
-        types,
-        education,
-        category,
-        title,
-        locations,
-        authId,
-        page = 1,
-        limit = 10,
-    } = query;
+// const getSearchFilterJobs = async (query: any) => {
+//     let { experience,
+//         types,
+//         job_pattern,
+//         category,
+//         searchTrams,
+//         maxDistance,
+//         authId,
+//         page = 1,
+//         limit = 10,
+//     } = query;
 
-    const filter: any = {
+//     const filter: any = {
+//         status: "Active",
+//     };
+
+//     let latitude: number | undefined;
+//     let longitude: number | undefined;
+//     let useGeoNear = false;
+
+//     if (authId) {
+//         const user = await User.findOne({ authId }).lean() as any;
+//         if (!user) throw new ApiError(404, "Access denied. Only users are allowed.");
+
+//         const coords = user?.locations?.coordinates;
+//         if (!Array.isArray(coords) || coords.length !== 2) {
+//             throw new ApiError(400, "Please set your location in your profile.");
+//         }
+
+//         [longitude, latitude] = coords;
+//     }
+
+//     const parseArray = (value: any) => {
+//         try {
+//             const parsed = JSON.parse(value);
+//             return Array.isArray(parsed) ? parsed : [parsed];
+//         } catch {
+//             return Array.isArray(value) ? value : [value];
+//         }
+//     };
+
+//     if (experience) filter.experience = { $in: parseArray(experience) };
+//     if (types) filter.types = { $in: parseArray(types) };
+//     if (job_pattern) filter.job_pattern = { $in: parseArray(job_pattern) };
+//     if (category) filter.category = { $in: parseArray(category) };
+
+//     const textFilters: any[] = [];
+//     if (searchTrams) {
+//         const searchRegex = new RegExp(searchTrams, "i");
+//         textFilters.push({ title: searchRegex }, { skill: searchRegex }, { address: searchRegex });
+//     }
+
+//     // If maxDistance is given and user location is valid
+//     if (maxDistance) {
+//         if (!authId) throw new ApiError(404, "Please create an account to search jobs!");
+//         if (!latitude || !longitude) throw new ApiError(404, "Please set a valid location in your profile.");
+//         if (!Number(maxDistance)) throw new ApiError(404, "Invalid max distance.");
+
+//         const maxDistanceInMeters = Number(maxDistance) * 1609.34;
+
+//         filter.locations = {
+//             $near: {
+//                 $geometry: {
+//                     type: "Point",
+//                     coordinates: [longitude, latitude],
+//                 },
+//                 $maxDistance: maxDistanceInMeters,
+//             },
+//         };
+
+//         useGeoNear = true;
+//     }
+
+
+//     if (textFilters.length > 0) {
+//         filter.$or = textFilters;
+//     }
+
+//     const pageNum = parseInt(page);
+//     const limitNum = parseInt(limit);
+//     const skip = (pageNum - 1) * limitNum;
+
+//     let jobQuery = Jobs.find(filter)
+//         .select("title category locations address types experience education createdAt userId favorite application_dateline salary")
+//         .populate('category')
+//         .populate({
+//             path: "userId",
+//             select: "profile_image organization_types years_of_establishment company"
+//         })
+//         .skip(skip)
+//         .limit(limitNum)
+//         .lean();
+
+//     if (!useGeoNear) {
+//         jobQuery = jobQuery.sort({ createdAt: -1 });
+//     }
+
+//     const [jobsRaw, total] = await Promise.all([
+//         jobQuery,
+//         Jobs.countDocuments(filter)
+//     ]);
+
+//     const jobs = jobsRaw.map((job: any) => {
+//         const isFavorite = Array.isArray(job.favorite) && authId
+//             ? job.favorite.some((id: any) => id.toString() === authId.toString())
+//             : false;
+//         const { favorite, ...jobWithoutFavorite } = job;
+//         return {
+//             ...jobWithoutFavorite,
+//             isFavorite,
+//         };
+//     });
+
+//     return {
+//         jobs,
+//         meta: {
+//             page: pageNum,
+//             limit: limitNum,
+//             total,
+//             totalPage: Math.ceil(total / limitNum),
+//         },
+//     };
+// };
+
+
+const getSearchFilterJobs = async (query: any) => {
+    let { experience, types, job_pattern, category, searchTrams, maxDistance, authId, page = 1, limit = 10, } = query;
+
+    const matchStage: any = {
         status: "Active",
     };
+
+    let latitude: number | undefined;
+    let longitude: number | undefined;
+
+    if (authId) {
+        const user = await User.findOne({ authId }).lean() as any;
+        if (!user) throw new ApiError(404, "Access denied. Only users are allowed.");
+        const coords = user?.locations?.coordinates;
+        if (!Array.isArray(coords) || coords.length !== 2) {
+            throw new ApiError(400, "Please set your location in your profile.");
+        }
+        [longitude, latitude] = coords;
+    }
 
     const parseArray = (value: any) => {
         try {
@@ -457,68 +594,124 @@ const getSearchFilterJobs = async (query: any) => {
         }
     };
 
-    if (experience) filter.experience = { $in: parseArray(experience) };
-    if (types) filter.types = { $in: parseArray(types) };
-    if (education) filter.education = { $in: parseArray(education) };
-    if (category) filter.category = { $in: parseArray(category) };
+    if (experience) matchStage.experience = { $in: parseArray(experience) };
+    if (types) matchStage.types = { $in: parseArray(types) };
+    if (job_pattern) matchStage.job_pattern = { $in: parseArray(job_pattern) };
+    if (category) matchStage.category = { $in: parseArray(category) };
 
-    if (title || locations) {
-        filter.$or = [];
-        if (title) {
-            filter.$or.push({
-                title: { $regex: title, $options: "i" },
-            });
-        }
-        if (locations) {
-            filter.$or.push({
-                locations: { $regex: locations, $options: "i" },
-            });
-        }
+    const textFilters: any[] = [];
+    if (searchTrams) {
+        const regex = new RegExp(searchTrams, "i");
+        textFilters.push({ title: regex }, { skill: regex }, { address: regex });
+    }
+    if (textFilters.length > 0) {
+        matchStage.$or = textFilters;
     }
 
     const pageNum = parseInt(page);
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
 
-    let [jobs, total] = await Promise.all([
-        Jobs.find(filter)
-            .select("title category locations types experience education createdAt userId favorite application_dateline salary")
-            .populate('category')
+    let jobs = [];
+    let total = 0;
+
+    if (maxDistance) {
+        if (!authId) throw new ApiError(404, "Please create an account to search jobs!");
+        if (!latitude || !longitude) throw new ApiError(404, "Please set a valid location in your profile.");
+        if (!Number(maxDistance)) throw new ApiError(404, "Invalid max distance.");
+
+        const maxDistanceInMeters = Number(maxDistance) * 1609.34;
+
+        const pipeline: any[] = [
+            {
+                $geoNear: {
+                    near: {
+                        type: "Point",
+                        coordinates: [longitude, latitude],
+                    },
+                    distanceField: "distance",
+                    spherical: true,
+                    maxDistance: maxDistanceInMeters,
+                    key: "locations",
+                },
+            },
+            { $match: matchStage },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limitNum },
+            {
+                $lookup: {
+                    from: "categories",
+                    localField: "category",
+                    foreignField: "_id",
+                    as: "category",
+                },
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "userId",
+                    foreignField: "_id",
+                    as: "userId",
+                },
+            },
+            { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+            { $unwind: { path: "$userId", preserveNullAndEmptyArrays: true } },
+            {
+                $project: {
+                    title: 1,
+                    category: 1,
+                    locations: 1,
+                    address: 1,
+                    types: 1,
+                    experience: 1,
+                    education: 1,
+                    createdAt: 1,
+                    application_dateline: 1,
+                    salary: 1,
+                    "userId.profile_image": 1,
+                    "userId.company": 1,
+                    "userId.name": 1,
+                    favorite: 1,
+                },
+            },
+        ];
+
+        jobs = await Jobs.aggregate(pipeline);
+        total = await Jobs.countDocuments(matchStage);
+    } else {
+        const jobQuery = Jobs.find(matchStage)
+            .select("title category locations address types experience education createdAt userId favorite application_dateline salary")
+            .populate("category")
             .populate({
                 path: "userId",
-                select: "profile_image organization_types years_of_establishment company"
+                select: "profile_image name company",
             })
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limitNum)
-            .lean(),
+            .lean();
 
-        Jobs.countDocuments(filter)
-    ]);
-
-    if (jobs?.length && authId) {
-        // @ts-ignore
-        jobs = jobs?.map((job: any) => {
-            const isFavorite = Array.isArray(job.favorite) && job.favorite.some((id: any) => id.toString() === authId.toString());
-            const { favorite, ...jobWithoutFavorite } = job;
-            return {
-                ...jobWithoutFavorite,
-                isFavorite,
-            };
-        });
-    } else {
-        jobs = jobs?.map((job: any) => {
-            const isFavorite = false
-            const { favorite, ...jobWithoutFavorite } = job;
-            return {
-                ...jobWithoutFavorite,
-                isFavorite,
-            };
-        });
+        [jobs, total] = await Promise.all([
+            jobQuery,
+            Jobs.countDocuments(matchStage),
+        ]);
     }
 
+    const finalJobs = jobs.map((job: any) => {
+        const isFavorite =
+            Array.isArray(job.favorite) && authId
+                ? job.favorite.some((id: any) => id.toString() === authId.toString())
+                : false;
+        const { favorite, ...rest } = job;
+        return {
+            ...rest,
+            isFavorite,
+        };
+    });
+
     return {
-        jobs,
+        jobs: finalJobs,
         meta: {
             page: pageNum,
             limit: limitNum,
@@ -831,7 +1024,20 @@ const getTotalCountEmployer = async (user: IReqUser) => {
     };
 };
 
+const getTotalCountCandidate = async (user: IReqUser) => {
+    const { userId } = user;
 
+    const applications = await Applications.find({ userId });
+    const totalApplications = applications.length;
+
+    const jobs = await Jobs.find({ favorite: { $in: [userId] } });
+    const favoriteJobs = jobs.length;
+
+    return {
+        totalApplications,
+        favoriteJobs,
+    };
+};
 
 
 export const JobsServices = {
@@ -857,5 +1063,6 @@ export const JobsServices = {
     getUserProfileDetails,
     toggleUserFavorite,
     getUserFavoriteList,
-    getTotalCountEmployer
+    getTotalCountEmployer,
+    getTotalCountCandidate
 }

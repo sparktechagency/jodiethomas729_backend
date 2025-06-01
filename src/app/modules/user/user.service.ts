@@ -43,7 +43,7 @@ const updateMyProfile = async (req: RequestData): Promise<IUser> => {
     data.alert_job_type = JSON.parse(data?.alert_job_type);
   }
   if (data?.availability) {
-    data.types = JSON.parse(data?.types);
+    data.availability = JSON.parse(data?.availability);
   }
   if (data?.skill) {
     data.skill = JSON.parse(data?.skill);
@@ -116,7 +116,6 @@ const addWorkExperience = async (req: RequestData) => {
   return { result: updatedUser?.work_experience }
 };
 
-
 const deleteUSerAccount = async (payload: { email: string; password: string; }): Promise<void> => {
   const { email, password } = payload;
 
@@ -162,11 +161,61 @@ const removeWorkExperience = async (req: RequestData) => {
   return { result: updatedUser?.work_experience }
 };
 
+const uploadCandidateCV = async (req: RequestData) => {
+  const { userId } = req.user;
+
+  const files = req.file;
+
+  if (!files?.path) {
+    new ApiError(httpStatus.NOT_FOUND, "Please check and upload your CV here!");
+  }
+
+  const resume_url = files.path;
+
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        resume: resume_url,
+      },
+    },
+    { new: true }
+  ) as IUser;
+
+  return { result: updatedUser?.resume }
+};
+
+const updateMapLocationsCandidate = async (req: RequestData) => {
+  const { userId } = req.user;
+  const { longitude, latitude } = req.body as { latitude: string, longitude: string };
+
+
+  if (isNaN(Number(latitude)) || isNaN(Number(longitude))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Please send valid longitude and latitude!");
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      locations: {
+        type: "Point",
+        coordinates: [Number(longitude), Number(latitude)],
+      },
+    },
+    { new: true }
+  ) as IUser;
+
+  return { result: updatedUser?.locations };
+};
+
 
 export const UserService = {
   deleteUSerAccount,
   updateMyProfile,
   addWorkExperience,
-  removeWorkExperience
+  removeWorkExperience,
+  uploadCandidateCV,
+  updateMapLocationsCandidate
 };
 

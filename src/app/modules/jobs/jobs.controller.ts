@@ -284,6 +284,18 @@ const getTotalCountEmployer = catchAsync(async (req: Request, res: Response) => 
     });
 });
 
+const getTotalCountCandidate = catchAsync(async (req: Request, res: Response) => {
+    const query = req.query;
+    const result = await JobsServices.getTotalCountCandidate(req.user as any);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Get Successfully",
+        data: result,
+    });
+});
+
+
 
 export const JobsController = {
     createNewJobs,
@@ -308,5 +320,6 @@ export const JobsController = {
     getUserProfileDetails,
     toggleUserFavorite,
     getUserFavoriteList,
-    getTotalCountEmployer
+    getTotalCountEmployer,
+    getTotalCountCandidate
 }

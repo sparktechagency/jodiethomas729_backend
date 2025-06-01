@@ -69,12 +69,15 @@ const JobsSchema = new Schema<IJobs>(
             type: String,
             enum: ["day_shift", "evening_shift", "days", "hours", "flexibility"]
         },
+        //city
         address: { type: String, required: true },
 
 
     },
     { timestamps: true }
 );
+JobsSchema.index({ locations: "2dsphere" });
+
 
 const ApplicationsSchema = new Schema<IApplications>(
     {

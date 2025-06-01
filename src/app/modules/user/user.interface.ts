@@ -37,6 +37,7 @@ export interface IUser extends Document {
   }[];
   favorite: mongoose.Types.ObjectId[];
   locations: any;
+  resume: string | undefined;
 }
 
 export interface IEducational {

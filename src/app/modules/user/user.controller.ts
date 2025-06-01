@@ -43,11 +43,37 @@ const removeWorkExperience = catchAsync(async (req: Request, res: Response) => {
 });
 
 
+const uploadCandidateCV = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.uploadCandidateCV(req as any);
+  console.log("result", result);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Upload successfully.",
+    data: result,
+  });
+});
+
+const updateMapLocationsCandidate = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.updateMapLocationsCandidate(req as any);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Locations upload successfully.",
+    data: result,
+  });
+});
+
+
 
 export const UserController = {
   deleteMyAccount,
   updateProfile,
   addWorkExperience,
-  removeWorkExperience
+  removeWorkExperience,
+  uploadCandidateCV,
+  updateMapLocationsCandidate
 };
 

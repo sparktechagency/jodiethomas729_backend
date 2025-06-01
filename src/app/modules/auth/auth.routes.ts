@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { UserController } from '../user/user.controller';
 import { EmployerController } from '../employer/employer.controller';
 import { DashboardController } from '../dashboard/dashboard.controller';
+import uploadC from '../../middlewares/cloudinaryUpload';
 
 const router = express.Router();
 //------ Auth Route -----------------
@@ -87,6 +88,18 @@ router.patch(
   "/remove_work_experience/:experienceId",
   auth(ENUM_USER_ROLE.USER),
   UserController.removeWorkExperience);
+
+router.patch(
+  "/candidate_resume_upload",
+  auth(ENUM_USER_ROLE.USER),
+  uploadC.single('resume'),
+  UserController.uploadCandidateCV);
+
+router.patch(
+  "/candidate_map_locations_update",
+  auth(ENUM_USER_ROLE.USER),
+  UserController.updateMapLocationsCandidate);
+
 
 
 

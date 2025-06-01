@@ -32,17 +32,7 @@ const EducationalSchema = new Schema<IEducational>({
   },
 })
 
-const locationSchema = new Schema({
-  type: {
-    type: String,
-    enum: ["Point"],
-    default: "Point",
-  },
-  coordinates: {
-    type: [Number],
-    required: true,
-  },
-});
+
 
 const WorkExSchema = new Schema<IWorkExperience>({
   job_title: {
@@ -75,6 +65,18 @@ const WorkExSchema = new Schema<IWorkExperience>({
   },
 })
 
+const locationSchema = new Schema({
+  type: {
+    type: String,
+    enum: ["Point"],
+    default: "Point",
+  },
+  coordinates: {
+    type: [Number],
+    required: true,
+  },
+});
+
 const UserSchema = new Schema<IUser>(
   {
     authId: {
@@ -82,13 +84,13 @@ const UserSchema = new Schema<IUser>(
       required: true,
       ref: "Auth",
     },
-    profile_image: {
-      type: String,
-      default: null,
-    },
     name: {
       type: String,
       required: true,
+    },
+    profile_image: {
+      type: String,
+      default: null,
     },
     job_title: {
       type: [String],
@@ -99,10 +101,6 @@ const UserSchema = new Schema<IUser>(
     email: {
       type: String,
       required: true,
-    },
-    category: {
-      type: Schema.Types.ObjectId,
-      ref: 'Category',
     },
     experience: {
       type: String,
@@ -119,10 +117,6 @@ const UserSchema = new Schema<IUser>(
     phone_number: {
       type: String,
       default: null,
-    },
-    profile_private: {
-      type: Boolean,
-      default: false
     },
     details: {
       type: String,
@@ -159,6 +153,14 @@ const UserSchema = new Schema<IUser>(
       ref: 'Auth',
       default: [],
     },
+    resume: {
+      type: String,
+      default: undefined,
+    },
+    profile_private: {
+      type: Boolean,
+      default: false
+    },
     profile_access: {
       type: [{
         eId: {
@@ -179,7 +181,7 @@ const UserSchema = new Schema<IUser>(
   }, {
   timestamps: true,
 });
-
+UserSchema.index({ locations: "2dsphere" });
 const User: Model<IUser> = mongoose.model<IUser>("User", UserSchema);
 
 export default User;

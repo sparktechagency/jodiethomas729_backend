@@ -91,4 +91,5 @@ router.get('/total_count_employer',
     auth(ENUM_USER_ROLE.EMPLOYER),
     JobsController.getTotalCountEmployer
 );
+
 export const JobsRoutes = router;

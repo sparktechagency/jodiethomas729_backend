@@ -12,10 +12,10 @@ type UploadedFile = {
 };
 export type RequestData = {
   files?: {
-    [key: string]: Express.Multer.File[];  
+    [key: string]: Express.Multer.File[];
   };
   body?: {
-    [key: string]: any;  
+    [key: string]: any;
   };
   user: {
     authId: string;
@@ -25,6 +25,7 @@ export type RequestData = {
   params?: {
     id: string;
   };
+  file?: any;
   query?: {
     [key: string]: string | string[];
   };
