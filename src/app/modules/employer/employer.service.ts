@@ -147,10 +147,35 @@ const getProfileIncompleteParent = async (user: IReqUser) => {
   };
 };
 
+const updateMapLocationsEmployer = async (req: RequestData) => {
+  const { userId } = req.user;
+  const { longitude, latitude } = req.body as { latitude: string, longitude: string };
+
+
+  if (isNaN(Number(latitude)) || isNaN(Number(longitude))) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "Please send valid longitude and latitude!");
+  }
+
+  const updatedUser = await Employer.findByIdAndUpdate(
+    userId,
+    {
+      locations: {
+        type: "Point",
+        coordinates: [Number(longitude), Number(latitude)],
+      },
+    },
+    { new: true }
+  ) as IEmployer;
+
+  return { result: updatedUser?.locations };
+};
+
+
 export const EmployerService = {
   getProfile,
   deleteEmployerAccount,
   updateMyProfile,
-  getProfileIncompleteParent
+  getProfileIncompleteParent,
+  updateMapLocationsEmployer
 };
 

@@ -39,4 +39,5 @@ export type IEmployer = Document & {
   industry_types: string;
   team_size: string;
   years_of_establishment: Date;
+  locations: any;
 }

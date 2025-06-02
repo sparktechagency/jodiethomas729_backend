@@ -32,8 +32,6 @@ const EducationalSchema = new Schema<IEducational>({
   },
 })
 
-
-
 const WorkExSchema = new Schema<IWorkExperience>({
   job_title: {
     type: String,

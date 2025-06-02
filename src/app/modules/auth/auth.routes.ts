@@ -100,6 +100,10 @@ router.patch(
   auth(ENUM_USER_ROLE.USER),
   UserController.updateMapLocationsCandidate);
 
+router.patch(
+  "/employer_map_locations_update",
+  auth(ENUM_USER_ROLE.EMPLOYER),
+  EmployerController.updateMapLocationsEmployer);
 
 
 

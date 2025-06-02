@@ -46,10 +46,24 @@ const getProfileIncompleteParent = catchAsync(async (req: Request, res: Response
 });
 
 
+const updateMapLocationsEmployer = catchAsync(async (req: Request, res: Response) => {
+  const result = await EmployerService.updateMapLocationsEmployer(req as any);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Locations upload successfully.",
+    data: result,
+  });
+});
+
+
+
 export const EmployerController = {
   deleteMyAccount,
   getProfile,
   updateProfile,
-  getProfileIncompleteParent
+  getProfileIncompleteParent,
+  updateMapLocationsEmployer
 };
 

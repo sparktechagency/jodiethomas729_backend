@@ -118,7 +118,6 @@ const updateJobs = async (jobId: string, payload: Partial<IJobs>) => {
     }
 };
 
-
 const getEmployerJobs = async (user: IReqUser, query: any) => {
     const { page, limit } = query;
     const { authId } = user;

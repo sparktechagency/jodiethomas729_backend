@@ -17,6 +17,18 @@ const CompanySchema = new Schema<ICompany>({
   website_link: { type: String, default: null },
 });
 
+const locationSchema = new Schema({
+  type: {
+    type: String,
+    enum: ["Point"],
+    default: "Point",
+  },
+  coordinates: {
+    type: [Number],
+    required: true,
+  },
+});
+
 const EmployerSchema = new Schema<IEmployer>({
   authId: { type: Schema.Types.ObjectId, required: true, ref: "Auth" },
   name: { type: String, required: true },
@@ -26,6 +38,9 @@ const EmployerSchema = new Schema<IEmployer>({
   years_of_establishment: { type: Date, default: null },
   company: { type: CompanySchema },
   socialMedia: { type: SocialMediaSchema },
+  locations: {
+    type: locationSchema,
+  },
   subscription_status: {
     type: String,
     enum: ["Active", "None", "Expired"],
