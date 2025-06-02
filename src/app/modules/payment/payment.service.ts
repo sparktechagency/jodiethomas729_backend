@@ -104,6 +104,7 @@ const createCheckoutSessionStripe = async (req: any) => {
 
 const stripeCheckAndUpdateStatusSuccess = async (req: any) => {
     const sessionId = req.query.session_id;
+    console.log("stripeCheckAndUpdateStatusSuccess", sessionId)
 
     if (!sessionId) {
         return { status: "failed", message: "Missing session ID in the request." };

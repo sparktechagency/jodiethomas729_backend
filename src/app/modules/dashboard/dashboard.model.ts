@@ -112,8 +112,8 @@ const BlogSchema = new Schema<IBlog>({
         required: true
     },
     category: {
-        type: Schema.Types.ObjectId,
-        ref: "Category",
+        type: String,
+        enum: ["industry_insights", "career_&_skills", "business_&_hiring", "mindset_&_growth", "real_stories"],
         required: true,
     },
     descriptions: {

@@ -11,6 +11,7 @@ import { Category } from "../dashboard/dashboard.model";
 import Notification from "../notifications/notifications.model";
 import { IUser } from "../user/user.interface";
 import httpStatus from "http-status";
+import Employer from "../employer/employer.model";
 
 // ======================================
 const createNewJob = async (user: IReqUser, payload: IJobs) => {
@@ -752,71 +753,157 @@ const getJobsDetailsForCandidate = async (jobId: any) => {
 };
 // ==========================================
 const searchCandidate = async (user: IReqUser, query: any) => {
-    const { page = 1, limit = 10, education, experience, category } = query;
+    const {
+        page = 1,
+        limit = 10,
+        education,
+        experience,
+        searchTrams,
+        maxDistance
+    } = query;
+
     const { userId, authId } = user;
+
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
     const filter: any = {};
-    const parseArray = (value: any) => {
+
+    const parseArray = (value: any): any[] => {
+        if (!value) return [];
+        if (Array.isArray(value)) return value;
         try {
             const parsed = JSON.parse(value);
             return Array.isArray(parsed) ? parsed : [parsed];
         } catch {
-            return Array.isArray(value) ? value : [value];
+            return [value];
         }
     };
 
-    if (education && education.length > 0) {
-        filter.education = { $in: parseArray(education) };
+    if (education) filter.education = { $in: parseArray(education) };
+    if (experience) filter.experience = { $in: parseArray(experience) };
+
+    if (searchTrams) {
+        const regex = new RegExp(searchTrams, "i");
+        filter.$or = [
+            { name: regex },
+            { skill: regex },
+            { address: regex },
+        ];
     }
 
-    if (experience && experience.length > 0) {
-        filter.experience = { $in: parseArray(experience) };
+    // Geo Filtering (Optional)
+    if (maxDistance) {
+        const distanceMiles = Number(maxDistance);
+        if (isNaN(distanceMiles) || distanceMiles <= 0) {
+            throw new ApiError(400, "Invalid max distance.");
+        }
+
+        const employer = await Employer.findOne({ authId }).lean();
+        if (!employer) {
+            throw new ApiError(404, "Access denied. Only employers are allowed.");
+        }
+
+        const coords = employer?.locations?.coordinates;
+        if (!Array.isArray(coords) || coords.length !== 2) {
+            throw new ApiError(400, "Please set a valid location in your profile.");
+        }
+
+        const [longitude, latitude] = coords;
+        const maxDistanceInMeters = distanceMiles * 1609.34;
+
+        const geoCandidates = await User.aggregate([
+            {
+                $geoNear: {
+                    near: {
+                        type: "Point",
+                        coordinates: [longitude, latitude]
+                    },
+                    distanceField: "distance",
+                    spherical: true,
+                    maxDistance: maxDistanceInMeters,
+                    key: "locations"
+                }
+            },
+            { $match: filter },
+            { $sort: { createdAt: -1 } },
+            { $skip: skip },
+            { $limit: limitNum },
+            {
+                $project: {
+                    name: 1,
+                    email: 1,
+                    profile_image: 1,
+                    skill: 1,
+                    details: 1,
+                    address: 1,
+                    profile_private: 1,
+                    profile_access: 1,
+                    favorite: 1
+                }
+            }
+        ]);
+
+        const total = await User.countDocuments(filter);
+
+        const result = geoCandidates.map((u: any) => {
+            const hasAccess = u.profile_access?.some((entry: any) =>
+                entry.eId?.toString() === userId && entry.access === true
+            );
+            if (hasAccess) u.profile_private = false;
+            delete u.profile_access;
+
+            const isFavorite = Array.isArray(u.favorite) &&
+                u.favorite.some((id: any) => id.toString() === authId?.toString());
+            const { favorite, ...userData } = u;
+            return { ...userData, isFavorite };
+        });
+
+        return {
+            result,
+            meta: {
+                total,
+                page: pageNum,
+                limit: limitNum,
+                totalPages: Math.ceil(total / limitNum)
+            }
+        };
     }
 
-    if (category && category.length > 0) {
-        filter.category = { $in: parseArray(category) };
-    }
-
-    const skip = (parseInt(page) - 1) * parseInt(limit);
-
-    const users = await User.find(filter).lean()
-        .select('name email profile_image skill details permanent_address present_address profile_private profile_access favorite')
+    const users = await User.find(filter)
+        .select('name email profile_image skill details address profile_private profile_access favorite')
         .skip(skip)
-        .limit(parseInt(limit));
+        .limit(limitNum)
+        .lean();
+
+    const total = await User.countDocuments(filter);
 
     let result = users.map((u: any) => {
         const hasAccess = u.profile_access?.some((entry: any) =>
             entry.eId?.toString() === userId && entry.access === true
         );
-        if (hasAccess) {
-            u.profile_private = false;
-        }
+        if (hasAccess) u.profile_private = false;
         delete u.profile_access;
-        return u;
+
+        const isFavorite = Array.isArray(u.favorite) &&
+            u.favorite.some((id: any) => id.toString() === authId?.toString());
+
+        const { favorite, ...userData } = u;
+        return { ...userData, isFavorite };
     });
 
-    if (result?.length && authId) {
-        result = result?.map((user: any) => {
-            const isFavorite = Array.isArray(user.favorite) && user.favorite.some((id: any) => id.toString() === authId.toString());
-            const { favorite, ...jobWithoutFavorite } = user;
-            return {
-                ...jobWithoutFavorite,
-                isFavorite,
-            };
-        });
-    }
-
-
-    const total = await User.countDocuments(filter);
-
-    const meta = {
-        total,
-        page: parseInt(page),
-        limit: parseInt(limit),
-        totalPages: Math.ceil(total / limit),
+    return {
+        result,
+        meta: {
+            total,
+            page: pageNum,
+            limit: limitNum,
+            totalPages: Math.ceil(total / limitNum)
+        }
     };
-
-    return { result, meta };
 };
+
 
 const profileAccessRequest = async (user: IReqUser, userId: string) => {
     const { userId: employerId } = user;

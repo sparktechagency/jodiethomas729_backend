@@ -11,7 +11,7 @@ export type ISubscriptions = {
 
 export type IBlog = {
   title: string;
-  category: Types.ObjectId;
+  category: string;
   descriptions: string;
   image: string[];
 };

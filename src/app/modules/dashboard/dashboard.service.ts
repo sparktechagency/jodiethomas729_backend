@@ -587,7 +587,6 @@ const deleteBlog = async (blogId: string): Promise<IBlog | null> => {
 
 const getBlogDetails = async (query: any, id: string) => {
     const blog = await Blogs.findById(id)
-        .populate('category')
         .lean();
 
     if (!blog) {
@@ -618,7 +617,6 @@ const getAllBlogs = async (query: any) => {
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const blogs = await Blogs.find(filter)
-        .populate('category')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(parseInt(limit))
@@ -640,7 +638,6 @@ const getAllBlogs = async (query: any) => {
 };
 
 const getBlogDetailsAndRelated = async (id: string) => {
-    console.log('========', id)
     const blog = await Blogs.findById(id)
         .populate('category')
         .lean();
@@ -649,7 +646,7 @@ const getBlogDetailsAndRelated = async (id: string) => {
         throw new Error('Blog not found');
     }
     const relatedBlogs = await Blogs.find({
-        category: blog?.category?._id,
+        category: blog?.category,
     })
         .sort({ createdAt: -1 })
         .limit(6)
