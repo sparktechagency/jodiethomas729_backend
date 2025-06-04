@@ -286,7 +286,6 @@ const getCandidateDetails = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-
 const getAllJobs = catchAsync(async (req: Request, res: Response) => {
   const query = req.query;
   const result = await DashboardService.getAllJobs(query as any);
