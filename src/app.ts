@@ -12,6 +12,10 @@ app.use(
   cors({
     origin: [
       'http://192.168.10.16:3000',
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://localhost:3002",
+      "http://localhost:3003"
     ],
     credentials: true,
   }),
