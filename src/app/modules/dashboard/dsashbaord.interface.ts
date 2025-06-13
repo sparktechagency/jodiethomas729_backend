@@ -80,6 +80,7 @@ export type IContactSupport = {
   subject: string;
   message: string;
   user: Types.ObjectId;
+  reply: string | null
 }
 
 // export interface IComment extends Document {

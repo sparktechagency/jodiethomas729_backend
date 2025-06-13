@@ -152,7 +152,17 @@ router.get('/about_us',
   DashboardController.getAboutUs,
 );
 // ===Home page website=============================  
-
+router.post('/contact_us',
+  DashboardController.postContactUs,
+);
+router.patch('/replay_contact_us/:id',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.replayTheContactUs,
+);
+router.get('/contact_all',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.getAllContactUs,
+);
 
 
 export const DashboardRoutes = router;

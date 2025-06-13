@@ -100,7 +100,7 @@ const deleteEmployerAccount = async (payload: { email: string; password: string;
     isEmployerExist.password &&
     !(await Auth.isPasswordMatched(password, isEmployerExist.password))
   ) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Password is incorrect");
+    throw new ApiError(httpStatus.BAD_REQUEST, "Password is incorrect");
   }
 
   await Employer.deleteOne({ authId: isEmployerExist._id });

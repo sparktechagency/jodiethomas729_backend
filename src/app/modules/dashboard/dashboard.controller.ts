@@ -5,6 +5,7 @@ import { DashboardService } from './dashboard.service';
 import { IBlog, ICategory, ISubscriptions } from './dsashbaord.interface';
 import { Subscription } from './dashboard.model';
 import { IReqUser } from '../auth/auth.interface';
+import ApiError from '../../../errors/ApiError';
 
 const totalCount: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
@@ -408,6 +409,49 @@ const getBlogDetailsAndRelated = catchAsync(async (req: Request, res: Response) 
   });
 });
 
+
+const postContactUs = catchAsync(async (req: Request, res: Response) => {
+  const payload = req.body;
+  const result = await DashboardService.postContactUs(payload as any);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Submit successfully!',
+    data: result,
+  });
+});
+
+const getAllContactUs = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query;
+  const result = await DashboardService.getAllContactUs(query as any);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Get successfully!',
+    data: result,
+  });
+});
+
+const replayTheContactUs = catchAsync(async (req: Request, res: Response) => {
+  const reply = req.body.reply;
+  const id = req.params.id;
+  if (!reply) {
+    throw new ApiError(404, 'Replay text is required!');
+  }
+  console.log("hello", reply)
+  const result = await DashboardService.replyToContactUs(reply as string, id as any);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Replay successfully!',
+    data: result,
+  });
+});
+
+
 export const DashboardController = {
   getAllUser,
   createSubscriptions,
@@ -440,5 +484,8 @@ export const DashboardController = {
   deleteBlog,
   getBlogDetails,
   getAllBlogs,
-  getBlogDetailsAndRelated
+  getBlogDetailsAndRelated,
+  postContactUs,
+  getAllContactUs,
+  replayTheContactUs
 };

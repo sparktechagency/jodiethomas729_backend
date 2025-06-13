@@ -77,7 +77,7 @@ const sendJobAlerts = async (job: any) => {
 const updateJobs = async (jobId: string, payload: Partial<IJobs>) => {
     try {
         if (!Types.ObjectId.isValid(jobId)) {
-            throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid job ID');
+            throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid job ID');
         }
 
         const parsedData = jobValidationSchema.partial().parse(payload);

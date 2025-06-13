@@ -128,7 +128,7 @@ const deleteUSerAccount = async (payload: { email: string; password: string; }):
     isUserExist.password &&
     !(await Auth.isPasswordMatched(password, isUserExist.password))
   ) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, "Password is incorrect");
+    throw new ApiError(httpStatus.BAD_REQUEST, "Password is incorrect");
   }
 
   await User.deleteOne({ authId: isUserExist._id });

@@ -1,12 +1,12 @@
- import config from "../config";
+import config from "../config";
 
- interface ResetEmailTemplateData {
-    name: string;
-    verifyCode: string;
-    verifyExpire: number;
-  }
-  
-  const resetEmailTemplate = (data: ResetEmailTemplateData): string => `
+interface ResetEmailTemplateData {
+  name: string;
+  verifyCode: string;
+  verifyExpire: number;
+}
+
+const resetEmailTemplate = (data: ResetEmailTemplateData): string => `
     <html>
       <head>
         <style>
@@ -101,6 +101,5 @@
       </body>
     </html>
   `;
-  
-  export { resetEmailTemplate };
-  
+
+export { resetEmailTemplate };

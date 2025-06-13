@@ -1,7 +1,7 @@
 import QueryBuilder from "../../../builder/QueryBuilder";
 import ApiError from "../../../errors/ApiError";
 import User from "../user/user.model";
-import { AboutUs, Blogs, Category, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
+import { AboutUs, Blogs, Category, ContactUs, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
 import { IBlog, ICategory, ISubscriptions } from "./dsashbaord.interface";
 import { logger } from "../../../shared/logger";
 import { Transaction } from "../payment/payment.model";
@@ -10,6 +10,8 @@ import { IReqUser } from "../auth/auth.interface";
 import { ENUM_USER_ROLE } from "../../../enums/user";
 import { Applications, Jobs } from "../jobs/jobs.model";
 import Auth from "../auth/auth.model";
+import { contactUsReplyTemplate } from "../../../mails/email.contact";
+import sendEmail from "../../../utils/sendEmail";
 
 // ===========================================
 const getYearRange = (year: any) => {
@@ -189,7 +191,6 @@ const getMonthlyJobsGrowth = async (year?: number) => {
         throw error;
     }
 };
-
 // ===========================================
 const getAllUser = async (query: any) => {
     const { page, limit, searchTerm } = query;
@@ -590,7 +591,7 @@ const getBlogDetails = async (query: any, id: string) => {
         .lean();
 
     if (!blog) {
-        throw new Error('Blog not found');
+        throw new ApiError(404, 'Blog not found');
     }
 
     return blog;
@@ -643,7 +644,7 @@ const getBlogDetailsAndRelated = async (id: string) => {
         .lean();
 
     if (!blog) {
-        throw new Error('Blog not found');
+        throw new ApiError(404, 'Blog not found');
     }
     const relatedBlogs = await Blogs.find({
         category: blog?.category,
@@ -657,6 +658,75 @@ const getBlogDetailsAndRelated = async (id: string) => {
         relatedBlogs,
     };
 };
+
+const postContactUs = async (payload: { name: string, email: string, subject: string, message: string }) => {
+    const contact = await ContactUs.create(payload);
+
+    if (!contact) {
+        throw new ApiError(400, 'Something went wrong, please try again!');
+    }
+
+    return contact;
+};
+
+const getAllContactUs = async (query: any) => {
+    if (query?.searchTerm) {
+        delete query.page;
+    }
+
+    const contactQuery = new QueryBuilder(ContactUs.find(), query)
+        .search(["name", "email"])
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await contactQuery.modelQuery;
+    const meta = await contactQuery.countTotal();
+
+    // console.log(result); // Optional: remove or use conditional logging
+
+    return { result, meta };
+};
+
+const replyToContactUs = async (reply: string, id: string) => {
+
+    const resultDb = await ContactUs.findById(id)
+    if (!resultDb?.email) {
+        throw new ApiError(404, 'Contact message not, please try again!');
+    }
+    const contact = await ContactUs.findByIdAndUpdate(
+        id,
+        { reply },
+        { new: true }
+    );
+
+    if (!contact) {
+        throw new ApiError(404, 'Contact not found');
+    }
+
+    const html = contactUsReplyTemplate({
+        name: resultDb.name,
+        email: resultDb.email,
+        subject: resultDb.subject,
+        message: resultDb.message,
+        reply: reply,
+    });
+
+    sendEmail({
+        email: resultDb.email,
+        subject: `Re: ${resultDb.subject}`,
+        html
+    }).catch((error) => console.error("Failed to send email:", error.message));
+
+
+    return contact;
+};
+
+
+
+
+
 
 export const DashboardService = {
     totalCount,
@@ -689,5 +759,8 @@ export const DashboardService = {
     deleteBlog,
     getBlogDetails,
     getAllBlogs,
-    getBlogDetailsAndRelated
+    getBlogDetailsAndRelated,
+    postContactUs,
+    getAllContactUs,
+    replyToContactUs
 };
