@@ -87,7 +87,6 @@ const updateMyProfile = async (req: RequestData): Promise<IEmployer> => {
   return updateEmployer as IEmployer;
 };
 
-
 const getProfile = async (user: { userId: string }): Promise<IEmployer> => {
   const { userId } = user;
   const result = await Employer.findById(userId).populate("authId");
