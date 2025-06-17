@@ -8,9 +8,10 @@ import Employer from "./employer.model";
 import { IReqUser } from "../auth/auth.interface";
 
 const updateMyProfile = async (req: RequestData): Promise<IEmployer> => {
-  const { files, body: data } = req;
+  const { files, body: data } = req as any;
   const { userId, authId } = req.user;
-  if (!Object.keys(data as IEmployer).length) {
+
+  if (!Object.keys(data as IEmployer).length && !files) {
     throw new ApiError(
       httpStatus.BAD_REQUEST,
       "Data is missing in the request body!"
@@ -18,7 +19,6 @@ const updateMyProfile = async (req: RequestData): Promise<IEmployer> => {
   }
 
   const checkEmployer = await Employer.findById(userId);
-
   if (!checkEmployer) {
     throw new ApiError(httpStatus.NOT_FOUND, "Employer not found!");
   }
@@ -33,45 +33,60 @@ const updateMyProfile = async (req: RequestData): Promise<IEmployer> => {
     profile_image = `/images/profile/${files.profile_image[0].filename}`;
   }
 
-
+  // Parse and merge company data
   if (data?.company && typeof data.company === "string") {
     data.company = JSON.parse(data.company);
   }
 
+  if (data?.company && typeof data.company === "object") {
+    data.company = {
+      ...checkEmployer.company?.toObject?.(), // existing company data
+      ...data.company,                        // new values override
+    };
+  } else if (!data.company && files?.company_logo?.[0]?.filename) {
+    // Only logo is being updated
+    data.company = { ...checkEmployer.company?.toObject?.() };
+  }
+
+  // Update company logo path if new file is uploaded
+  if (files?.company_logo?.[0]?.filename) {
+    const companyLogoPath = `/images/image/${files.company_logo[0].filename}`;
+    if (!data.company || typeof data.company !== "object") {
+      data.company = {};
+    }
+    data.company.company_logo = companyLogoPath;
+  }
+
+  // Parse and merge socialMedia data
   if (data?.socialMedia && typeof data.socialMedia === "string") {
     data.socialMedia = JSON.parse(data.socialMedia);
   }
 
-  if (files?.company_logo?.[0]?.filename) {
-    const companyLogoPath = `/images/image/${files.company_logo[0].filename}`;
-    if (!data?.company || typeof data.company !== "object") {
-      // @ts-ignore
-      data.company = {};
-    }
-    // @ts-ignore
-    data.company.company_logo = companyLogoPath;
+  if (data?.socialMedia && typeof data.socialMedia === "object") {
+    data.socialMedia = {
+      ...checkEmployer.socialMedia?.toObject?.(),
+      ...data.socialMedia,
+    };
   }
 
   const updatedData = { ...data };
+
   const [, updateEmployer] = await Promise.all([
     Auth.findByIdAndUpdate(
       authId,
       { name: updatedData.name },
-      {
-        new: true,
-      }
+      { new: true }
     ),
     Employer.findByIdAndUpdate(
       userId,
       { profile_image, ...updatedData },
-      {
-        new: true,
-      }
+      { new: true }
     ).populate("authId"),
   ]);
 
   return updateEmployer as IEmployer;
 };
+
 
 const getProfile = async (user: { userId: string }): Promise<IEmployer> => {
   const { userId } = user;
