@@ -38,6 +38,7 @@ const updateMyProfile = async (req: RequestData): Promise<IUser> => {
   }
   if (data?.work_experience) {
     data.work_experience = JSON.parse(data?.work_experience);
+    console.log("=========", data?.work_experience)
   }
   if (data?.alert_job_type) {
     data.alert_job_type = JSON.parse(data?.alert_job_type);
@@ -91,7 +92,6 @@ const addWorkExperience = async (req: RequestData) => {
     "company_name",
     "location",
     "start_date",
-    "end_date",
     "details"
   ];
 
@@ -100,6 +100,8 @@ const addWorkExperience = async (req: RequestData) => {
       throw new ApiError(httpStatus.BAD_REQUEST, `${field} is required.`);
     }
   }
+
+  console.log("newExperience", newExperience)
 
   const updatedUser = await User.findByIdAndUpdate(
     userId,
@@ -115,6 +117,57 @@ const addWorkExperience = async (req: RequestData) => {
 
   return { result: updatedUser?.work_experience }
 };
+
+const updateWorkExperience = async (req: any) => {
+  const { body: updatedExperience } = req as any;
+  const { userId } = req.user;
+  const experienceId = req.params.experienceId;
+
+  if (!experienceId) {
+    throw new ApiError(httpStatus.BAD_REQUEST, "_id of work experience is required.");
+  }
+
+  const checkUser = await User.findById(userId);
+  if (!checkUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+  }
+
+  const requiredFields = [
+    "job_title",
+    "company_name",
+    "location",
+    "start_date",
+    "details",
+  ];
+
+  for (const field of requiredFields) {
+    if (!updatedExperience[field]) {
+      throw new ApiError(httpStatus.BAD_REQUEST, `${field} is required.`);
+    }
+  }
+
+  const updatedUser = await User.findOneAndUpdate(
+    { _id: userId, "work_experience._id": experienceId },
+    {
+      $set: {
+        "work_experience.$.job_title": updatedExperience.job_title,
+        "work_experience.$.company_name": updatedExperience.company_name,
+        "work_experience.$.location": updatedExperience.location,
+        "work_experience.$.start_date": updatedExperience.start_date,
+        "work_experience.$.end_date": updatedExperience.end_date || null,
+        "work_experience.$.details": updatedExperience.details,
+      },
+    },
+    { new: true }
+  ).populate("authId");
+
+  if (!updatedUser) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Experience not found or failed to update.");
+  }
+
+  return { result: updatedUser.work_experience };
+};
+
 
 const deleteUSerAccount = async (payload: { email: string; password: string; }): Promise<void> => {
   const { email, password } = payload;
@@ -216,6 +269,7 @@ export const UserService = {
   addWorkExperience,
   removeWorkExperience,
   uploadCandidateCV,
-  updateMapLocationsCandidate
+  updateMapLocationsCandidate,
+  updateWorkExperience
 };
 

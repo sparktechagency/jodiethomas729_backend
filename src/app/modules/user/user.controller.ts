@@ -32,6 +32,18 @@ const addWorkExperience = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateWorkExperience = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.updateWorkExperience(req as any);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Updates successfully.",
+    data: result,
+  });
+});
+
+
+
 const removeWorkExperience = catchAsync(async (req: Request, res: Response) => {
   const result = await UserService.removeWorkExperience(req as any);
   sendResponse(res, {
@@ -74,6 +86,7 @@ export const UserController = {
   addWorkExperience,
   removeWorkExperience,
   uploadCandidateCV,
-  updateMapLocationsCandidate
+  updateMapLocationsCandidate,
+  updateWorkExperience
 };
 

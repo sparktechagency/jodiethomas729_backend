@@ -46,11 +46,10 @@ const WorkExSchema = new Schema<IWorkExperience>({
     required: true,
   },
   end_date: {
-    type: String,
-    required: true,
+    type: Date,
   },
   start_date: {
-    type: String,
+    type: Date,
     required: true,
   },
   currently_work: {
@@ -92,6 +91,7 @@ const UserSchema = new Schema<IUser>(
     },
     job_title: {
       type: [String],
+      default: [],
     },
     job_seeking: {
       type: [String],
@@ -130,7 +130,8 @@ const UserSchema = new Schema<IUser>(
     //   type: [EducationalSchema],
     // },
     work_experience: {
-      type: [WorkExSchema]
+      type: [WorkExSchema],
+      default: [],
     },
     skill: {
       type: [String],

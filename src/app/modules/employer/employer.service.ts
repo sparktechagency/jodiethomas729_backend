@@ -1,6 +1,5 @@
 import ApiError from "../../../errors/ApiError";
 import httpStatus from "http-status";
-import { Request } from "express";
 import { RequestData } from "../../../interfaces/common";
 import Auth from "../auth/auth.model";
 import { IEmployer } from "./employer.interface";

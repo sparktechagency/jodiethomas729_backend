@@ -85,6 +85,11 @@ router.patch(
   auth(ENUM_USER_ROLE.USER),
   UserController.addWorkExperience);
 router.patch(
+  "/update_work_experience/:experienceId",
+  auth(ENUM_USER_ROLE.USER),
+  UserController.updateWorkExperience);
+
+router.patch(
   "/remove_work_experience/:experienceId",
   auth(ENUM_USER_ROLE.USER),
   UserController.removeWorkExperience);

@@ -54,8 +54,8 @@ export interface IWorkExperience {
   job_title: string;
   company_name: string;
   location: string;
-  end_date: string;
-  start_date: string;
+  end_date: Date;
+  start_date: Date;
   details: string;
   currently_work: boolean
 }
