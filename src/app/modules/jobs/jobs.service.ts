@@ -840,6 +840,7 @@ const searchCandidate = async (user: IReqUser, query: any) => {
                     skill: 1,
                     details: 1,
                     address: 1,
+                    experience: 1,
                     profile_private: 1,
                     profile_access: 1,
                     favorite: 1
