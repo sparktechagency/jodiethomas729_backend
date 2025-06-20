@@ -751,6 +751,7 @@ const getJobsDetailsForCandidate = async (jobId: any) => {
         relatedJobs
     };
 };
+
 // ==========================================
 const searchCandidate = async (user: IReqUser, query: any) => {
     const {
@@ -834,6 +835,7 @@ const searchCandidate = async (user: IReqUser, query: any) => {
                 $project: {
                     name: 1,
                     email: 1,
+                    job_title: 1,
                     profile_image: 1,
                     skill: 1,
                     details: 1,
@@ -903,7 +905,6 @@ const searchCandidate = async (user: IReqUser, query: any) => {
         }
     };
 };
-
 
 const profileAccessRequest = async (user: IReqUser, userId: string) => {
     const { userId: employerId } = user;
