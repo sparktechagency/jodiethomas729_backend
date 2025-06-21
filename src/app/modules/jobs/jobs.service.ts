@@ -31,6 +31,7 @@ const createNewJob = async (user: IReqUser, payload: IJobs) => {
             userId: new Types.ObjectId(userId),
             locations,
         };
+
         // console.log('payload', jobData, authId)
         const job = new Jobs(jobData);
         await job.save();
@@ -125,6 +126,7 @@ const getEmployerJobs = async (user: IReqUser, query: any) => {
     console.log("query", authId)
 
     const transitionQuery = new QueryBuilder(Jobs.find({ authId })
+        .populate("category")
         , query)
         .search([])
         .filter()
@@ -209,7 +211,7 @@ const getJobsApplications = async (user: IReqUser, query: any) => {
 const getJobsDetails = async (query: any) => {
     const { page, limit, jobId } = query;
 
-    const jobDetails = await Jobs.findById(jobId).select("-applications -favorite")
+    const jobDetails = await Jobs.findById(jobId).select("-applications -favorite").populate("category");
 
     const transitionQuery = new QueryBuilder(Applications.find({ jobId }).populate({
         path: "userId",
@@ -224,7 +226,7 @@ const getJobsDetails = async (query: any) => {
 
     const result = await transitionQuery.modelQuery;
     const meta = await transitionQuery.countTotal();
-    // console.log(result)
+    console.log('==============', jobDetails)
     return { jobDetails, result, meta };
 };
 
@@ -875,7 +877,7 @@ const searchCandidate = async (user: IReqUser, query: any) => {
     }
 
     const users = await User.find(filter)
-        .select('name email profile_image skill details address profile_private profile_access favorite')
+        .select('name email profile_image skill details address profile_private profile_access favorite job_title experience')
         .skip(skip)
         .limit(limitNum)
         .lean();
