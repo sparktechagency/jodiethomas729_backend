@@ -1023,7 +1023,7 @@ const getUserProfileDetails = async (user: IReqUser, userId: any) => {
     const { userId: employerId } = user;
 
     const userDetails = await User.findById(userId)
-        .populate('category')
+        // .populate('category')
         .select("-favorite")
         .lean();
 
