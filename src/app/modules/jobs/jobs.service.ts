@@ -136,7 +136,6 @@ const getEmployerJobs = async (user: IReqUser, query: any) => {
 
     const result = await transitionQuery.modelQuery;
     const meta = await transitionQuery.countTotal();
-    // console.log(result)
     return { result, meta };
 
 };
