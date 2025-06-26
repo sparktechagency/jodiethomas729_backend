@@ -83,6 +83,8 @@ const updateJobs = async (jobId: string, payload: Partial<IJobs>) => {
 
         const parsedData = jobValidationSchema.partial().parse(payload);
 
+        console.log("===", payload)
+
         const job = await Jobs.findById(jobId);
         if (!job) {
             throw new ApiError(httpStatus.NOT_FOUND, 'Job not found or unauthorized');
