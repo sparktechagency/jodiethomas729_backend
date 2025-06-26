@@ -123,7 +123,6 @@ const updateJobs = async (jobId: string, payload: Partial<IJobs>) => {
 const getEmployerJobs = async (user: IReqUser, query: any) => {
     const { page, limit } = query;
     const { authId } = user;
-    console.log("query", authId)
 
     const transitionQuery = new QueryBuilder(Jobs.find({ authId })
         .populate("category")
@@ -136,8 +135,8 @@ const getEmployerJobs = async (user: IReqUser, query: any) => {
 
     const result = await transitionQuery.modelQuery;
     const meta = await transitionQuery.countTotal();
-    return { result, meta };
 
+    return { result, meta };
 };
 
 const applyJobs = async (

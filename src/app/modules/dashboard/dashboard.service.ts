@@ -320,11 +320,12 @@ const categoryInsertIntoDB = async (files: any, payload: ICategory) => {
 };
 
 const allCategory = async (query: Record<string, unknown>) => {
-    const categoryQuery = new QueryBuilder(Category.find(), query)
+    const categoryQuery = new QueryBuilder(Category.find().sort({ createdAt: -1 }), query)
         .search(['category'])
         .filter()
-        .fields();
-
+        .fields()
+        .sort()
+    // 6818a0af4da407161b0208ce
     const result = await categoryQuery.modelQuery;
 
     return {

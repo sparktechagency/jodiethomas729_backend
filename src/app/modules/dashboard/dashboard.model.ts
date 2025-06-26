@@ -76,7 +76,7 @@ const categorySchema = new Schema<ICategory>(
             type: String,
             required: true,
         },
-    }
+    }, { timestamps: true }
 );
 
 const termsAndConditionsSchema = new mongoose.Schema(
