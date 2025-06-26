@@ -5,6 +5,7 @@ import Message from './message.model';
 import ApiError from '../../../errors/ApiError';
 import User from '../auth/auth.model';
 
+
 //* One to one conversation
 // const sendMessage = async (req: Request) => {
 //   const { id: receiverId } = req.params;
@@ -71,7 +72,7 @@ const sendMessage = async (req: Request) => {
 
   let message_img = ''
   if (files?.message_img) {
-     message_img = `/images/message/${files.message_img[0].filename}`;
+    message_img = `/images/message/${files.message_img[0].filename}`;
   }
 
   const newMessage = new Message({
@@ -84,13 +85,13 @@ const sendMessage = async (req: Request) => {
 
   conversation.messages.push(newMessage._id);
   await Promise.all([conversation.save(), newMessage.save()]);
-   //@ts-ignore
-  const socketIO = global.io; 
-     //@ts-ignore
+  //@ts-ignore
+  const socketIO = global.io;
+  //@ts-ignore
   if (socketIO && conversation && newMessage) {
     socketIO.emit(`message::${conversation._id.toString()}`, newMessage);
   }
-  
+
   return newMessage;
 };
 
