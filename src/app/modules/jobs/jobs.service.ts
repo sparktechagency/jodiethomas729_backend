@@ -669,6 +669,7 @@ const getSearchFilterJobs = async (query: any) => {
                     experience: 1,
                     education: 1,
                     createdAt: 1,
+                    vacancies: 1,
                     application_dateline: 1,
                     salary: 1,
                     "userId.profile_image": 1,
@@ -683,7 +684,7 @@ const getSearchFilterJobs = async (query: any) => {
         total = await Jobs.countDocuments(matchStage);
     } else {
         const jobQuery = Jobs.find(matchStage)
-            .select("title category locations address types experience education createdAt userId favorite application_dateline salary")
+            .select("title category locations address types experience education createdAt userId favorite application_dateline salary vacancies")
             .populate("category")
             .populate({
                 path: "userId",
@@ -741,7 +742,8 @@ const getJobsDetailsForCandidate = async (jobId: any) => {
     const relatedJobs = await Jobs.find({
         // @ts-ignore
         category: jobDetails.category?._id,
-        status: "Active"
+        status: "Active",
+        _id: { $ne: jobId },
     })
         .select("title category locations types experience education createdAt userId")
         .limit(6)

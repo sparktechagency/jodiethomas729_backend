@@ -38,6 +38,14 @@ const EmployerSchema = new Schema<IEmployer>({
   years_of_establishment: { type: Date, default: null },
   company: { type: CompanySchema },
   socialMedia: { type: SocialMediaSchema },
+  details: {
+    type: String,
+    default: null
+  },
+  address: {
+    type: String,
+    default: null
+  },
   locations: {
     type: locationSchema,
   },

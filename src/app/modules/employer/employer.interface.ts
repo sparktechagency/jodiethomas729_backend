@@ -40,4 +40,6 @@ export type IEmployer = Document & {
   team_size: string;
   years_of_establishment: Date;
   locations: any;
+  details: String;
+  address: String;
 }

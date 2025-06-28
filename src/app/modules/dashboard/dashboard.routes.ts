@@ -74,9 +74,10 @@ router.get(
 );
 router.get(
   '/employer_details/:userId',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  // auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   DashboardController.getEmployerDetails,
 );
+
 // =============
 router.get(
   '/all_candidate',
