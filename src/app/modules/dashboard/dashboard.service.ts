@@ -366,6 +366,11 @@ const deleteCategory = async (id: string) => {
     if (!isExist) {
         throw new ApiError(404, 'Category not found !');
     }
+    const jobsUsingCategory = await Jobs.findOne({ category: id });
+    if (jobsUsingCategory) {
+        throw new ApiError(400, "Can't delete category, jobs are already assigned to it.");
+    }
+
     return await Category.findByIdAndDelete(id);
 };
 

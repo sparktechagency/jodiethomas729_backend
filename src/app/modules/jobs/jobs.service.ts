@@ -268,11 +268,16 @@ const getAllApplyCandidate = async (user: IReqUser, query: any) => {
     const transitionQuery = new QueryBuilder(
         Applications.find({ userId }).populate({
             path: "jobId",
-            populate: {
-                path: "userId",
-                select: "profile_image organization_types years_of_establishment company socialMedia"
-            }
-        }).populate({ path: "category" }),
+            populate: [
+                {
+                    path: "userId",
+                    select: "profile_image organization_types years_of_establishment company socialMedia",
+                },
+                {
+                    path: "category",
+                }
+            ]
+        }),
         query
     )
         .search([])
