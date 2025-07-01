@@ -163,7 +163,16 @@ const applyJobs = async (
         if (jobs.status === "Expired") {
             throw new AppError(400, "This job is already closed.");
         }
+        // ====
+        const alreadyApplied = await Applications.findOne({
+            jobId: new Types.ObjectId(jobId),
+            userId: new Types.ObjectId(userId),
+        });
 
+        if (alreadyApplied) {
+            throw new AppError(400, "You have already applied for this job.");
+        }
+        // ===
         const applyData = {
             ...payload,
             jobId: new Types.ObjectId(jobId),
@@ -263,7 +272,7 @@ const getAllApplyCandidate = async (user: IReqUser, query: any) => {
                 path: "userId",
                 select: "profile_image organization_types years_of_establishment company socialMedia"
             }
-        }),
+        }).populate({ path: "category" }),
         query
     )
         .search([])
