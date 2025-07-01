@@ -226,7 +226,7 @@ const getJobsDetails = async (query: any) => {
 
     const result = await transitionQuery.modelQuery;
     const meta = await transitionQuery.countTotal();
-    console.log('==============', jobDetails)
+    // console.log('==============', jobDetails)
     return { jobDetails, result, meta };
 };
 
@@ -566,7 +566,6 @@ const getRecentJobs = async (query: any) => {
 //     };
 // };
 
-
 const getSearchFilterJobs = async (query: any) => {
     let { experience, types, job_pattern, category, searchTrams, maxDistance, authId, page = 1, limit = 10, } = query;
 
@@ -745,7 +744,7 @@ const getJobsDetailsForCandidate = async (jobId: any) => {
         status: "Active",
         _id: { $ne: jobId },
     })
-        .select("title category locations types experience education createdAt userId")
+        .select("title category locations types experience education createdAt userId vacancies address")
         .limit(6)
         .sort({ createdAt: -1 })
         .populate('category');

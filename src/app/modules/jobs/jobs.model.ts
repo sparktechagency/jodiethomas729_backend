@@ -85,7 +85,7 @@ const ApplicationsSchema = new Schema<IApplications>(
         jobId: { type: Schema.Types.ObjectId, ref: 'Jobs', required: true },
         resume: { type: String, required: true },
         expected_salary: { type: Number },
-        cover_letter: { type: String, required: true },
+        cover_letter: { type: String },
     },
     { timestamps: true }
 );

@@ -599,9 +599,10 @@ const getBlogDetails = async (query: any, id: string) => {
 };
 // =================================
 const getAllBlogs = async (query: any) => {
-    let { category, page = 1, limit = 10 } = query;
+    let { category, page = 1, limit = 10, searchTerm } = query;
     const filter: any = {};
 
+    // Handle category filter
     if (category) {
         try {
             category = JSON.parse(category);
@@ -614,6 +615,13 @@ const getAllBlogs = async (query: any) => {
         if (Array.isArray(category) && category.length > 0) {
             filter.category = { $in: category };
         }
+    }
+    if (searchTerm && typeof searchTerm === 'string') {
+        const regex = new RegExp(searchTerm, 'i');
+        filter.$or = [
+            { title: regex },
+            { descriptions: regex },
+        ];
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -630,7 +638,7 @@ const getAllBlogs = async (query: any) => {
         total,
         page: parseInt(page),
         limit: parseInt(limit),
-        totalPage: Math.ceil(total / limit),
+        totalPage: Math.ceil(total / parseInt(limit)),
     };
 
     return {
@@ -638,6 +646,7 @@ const getAllBlogs = async (query: any) => {
         data: blogs,
     };
 };
+
 
 const getBlogDetailsAndRelated = async (id: string) => {
     const blog = await Blogs.findById(id)
