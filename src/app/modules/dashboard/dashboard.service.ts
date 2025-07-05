@@ -338,8 +338,6 @@ const updateCategory = async (req: any) => {
     const id = req.params.id;
     const { ...AddsData } = req.body;
 
-    console.log("AddsData", AddsData)
-
     if (files && files.image) {
         AddsData.image = `/images/image/${files.image[0].filename}`;
     }
@@ -357,7 +355,7 @@ const updateCategory = async (req: any) => {
             new: true,
         },
     );
-    console.log("result", result)
+
     return result;
 };
 
@@ -483,7 +481,7 @@ const getAllCandidate = async (query: any) => {
 
     const userQuery = new QueryBuilder(
         // @ts-ignore
-        User.find().select('-profile_access -favorite'),
+        User.find().populate('authId').select('-profile_access -favorite').sort({ createdAt: -1 }),
         query
     )
 

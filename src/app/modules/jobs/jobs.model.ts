@@ -28,7 +28,7 @@ const JobsSchema = new Schema<IJobs>(
         experience: {
             type: String,
             required: true,
-            enum: ["freshers", "1_2_years", "2_4_years", "4_6_years", "6_8_years", "8_10_years", "10plus"]
+            enum: ["freshers", "1_2_years", "2_4_years", "4_6_years", "6_8_years", "8_10_years", "10plus", "n/a"]
         },
         types: {
             type: String,
