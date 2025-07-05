@@ -58,12 +58,13 @@ const updateProfile = async (req: IRequest): Promise<IAdmin | null> => {
 };
 
 const getAllAdmin = async () => {
-  const admins = await Admin.find().lean();
+  const admins = await Admin.find().sort({ createAt: -1 }).lean();
   return admins.map((admin) => ({
     ...admin,
     role: "Admin",
   }));
 };
+
 
 const deleteAuthAccount = async (user: IReqUser, email: string) => {
   const { authId } = user;

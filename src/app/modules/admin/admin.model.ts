@@ -12,6 +12,9 @@ const AdminSchema = new mongoose.Schema<IAdmin>(
       type: String,
       required: true,
     },
+    phone_number: {
+      type: String,
+    },
     email: {
       type: String,
       required: true,

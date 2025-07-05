@@ -11,4 +11,5 @@ export type IAdmin = Document & {
   division?: string | null;
   contact?: string | null;
   address?: string | null;
+  phone_number: string | null;
 }

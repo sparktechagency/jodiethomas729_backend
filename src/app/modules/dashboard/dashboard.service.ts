@@ -430,7 +430,7 @@ const getAllEmployer = async (query: any) => {
         delete query.page;
     }
 
-    const userQuery = new QueryBuilder(Employer.find()
+    const userQuery = new QueryBuilder(Employer.find().populate('authId')
         , query)
         .search(["name", "email"])
         .filter()
