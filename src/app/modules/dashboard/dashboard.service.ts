@@ -534,8 +534,11 @@ const getAllJobs = async (query: any) => {
         delete query.page;
     }
 
-    const jobsQuery = new QueryBuilder(Jobs.find()
+    console.log("searchTerm", query.searchTerm)
+
+    const jobsQuery = new QueryBuilder(Jobs.find().populate('category')
         , query)
+        .search(["title", "descriptions"])
         .filter()
         .sort()
         .paginate()
@@ -543,8 +546,6 @@ const getAllJobs = async (query: any) => {
 
     const result = await jobsQuery.modelQuery;
     const meta = await jobsQuery.countTotal();
-
-    console.log(result)
 
     return { result, meta };
 }
