@@ -18,13 +18,12 @@ const messageSchema = new mongoose.Schema<IMessage>(
       ref: 'Conversation',
       required: true,
     },
-
     message: {
       type: String,
       required: true,
     },
     message_img: {
-      type: String, 
+      type: String,
     },
   },
   {

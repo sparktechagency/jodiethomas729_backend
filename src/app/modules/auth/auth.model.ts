@@ -31,6 +31,7 @@ const AuthSchema: Schema<IAuth> = new Schema(
     },
     profile_image: {
       type: String,
+      default: null,
     },
     verifyCode: {
       type: String,

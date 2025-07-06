@@ -46,7 +46,7 @@ const updateProfile = async (req: IRequest): Promise<IAdmin | null> => {
 
   await Auth.findOneAndUpdate(
     { _id: authId },
-    { name: updatedData.name },
+    { name: updatedData.name, profile_image },
     { new: true }
   );
 

@@ -7,14 +7,13 @@ export enum ENUM_USER_ROLE {
 }
 
 export enum ENUM_SOCKET_EVENT {
-  CONNECT = "connection",
   NOTIFICATION = "notification",
   NEW_NOTIFICATION = "new-notification",
   SEEN_NOTIFICATION = "seen-notification",
+  CONNECT = "connection",
   MESSAGE_NEW = "new-message",
-  MESSAGE_GETALL = "message",
-  CONVERSION = "conversion",
-  PARTNER_LOCATION = "partner-location",
+  MESSAGE_GETALL = "all-message",
+  CONVERSION = "conversion-list",
 };
 
 export enum ENUM_MEAL_TYPE {

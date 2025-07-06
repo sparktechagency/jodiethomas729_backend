@@ -61,7 +61,7 @@ const updateMyProfile = async (req: RequestData): Promise<IUser> => {
   const [, updateUser] = await Promise.all([
     Auth.findByIdAndUpdate(
       authId,
-      { name: updatedData.name },
+      { name: updatedData.name, profile_image },
       {
         new: true,
       }
