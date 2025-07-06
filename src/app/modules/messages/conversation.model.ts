@@ -6,7 +6,7 @@ const conversationSchema = new mongoose.Schema<IConversation>(
     participants: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        // ref: 'User',
+        ref: 'Auth',
       },
     ],
 

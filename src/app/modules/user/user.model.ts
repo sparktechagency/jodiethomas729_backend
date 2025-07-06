@@ -108,6 +108,9 @@ const UserSchema = new Schema<IUser>(
       type: [String],
       enum: ["full_time", "part_time", "internship", "remote_hybrid", "temporary", "fixedterm_contract", "apprenticeship", "graduate_entrylevel"]
     },
+    availabil_date: {
+      type: Date,
+    },
     education: {
       type: String,
       enum: ["gcse_or_equivalent", "apprenticeship", "hnc_hnd", "degree", "other"]

@@ -48,8 +48,10 @@ const applyJobs = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body as IApplications;
     const user = req.user as IReqUser;
     const jobId = req.params.jobId;
-    const files = req.file;
-    const result = await JobsServices.applyJobs(jobId as any, user as IReqUser, payload as IApplications, files as any);
+    // const files = req.file;
+    const result = await JobsServices.applyJobs(jobId as any, user as IReqUser, payload as IApplications
+        // , files as any
+    );
 
     sendResponse(res, {
         statusCode: 200,

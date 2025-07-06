@@ -145,16 +145,16 @@ const applyJobs = async (
     jobId: string,
     user: IReqUser,
     payload: IApplications,
-    files: Express.Multer.File[]
+    // files: Express.Multer.File[]
 ) => {
     const { userId } = user;
 
     try {
         // @ts-ignore
-        if (files && files?.path) {
-            // @ts-ignore
-            payload.resume = files.path;
-        }
+        // if (files && files?.path) {
+        //     // @ts-ignore
+        //     payload.resume = files.path;
+        // }
 
         const jobs = await Jobs.findById(jobId)
         if (!jobs) {
@@ -770,6 +770,161 @@ const getJobsDetailsForCandidate = async (jobId: any) => {
 };
 
 // ==========================================
+// const searchCandidate = async (user: IReqUser, query: any) => {
+//     const {
+//         page = 1,
+//         limit = 10,
+//         education,
+//         experience,
+//         searchTrams,
+//         maxDistance
+//     } = query;
+
+//     const { userId, authId } = user;
+
+//     const pageNum = parseInt(page, 10);
+//     const limitNum = parseInt(limit, 10);
+//     const skip = (pageNum - 1) * limitNum;
+
+//     const filter: any = {};
+
+//     const parseArray = (value: any): any[] => {
+//         if (!value) return [];
+//         if (Array.isArray(value)) return value;
+//         try {
+//             const parsed = JSON.parse(value);
+//             return Array.isArray(parsed) ? parsed : [parsed];
+//         } catch {
+//             return [value];
+//         }
+//     };
+
+//     if (education) filter.education = { $in: parseArray(education) };
+//     if (experience) filter.experience = { $in: parseArray(experience) };
+
+//     if (searchTrams) {
+//         const regex = new RegExp(searchTrams, "i");
+//         filter.$or = [
+//             { name: regex },
+//             { skill: regex },
+//             { address: regex },
+//         ];
+//     }
+
+//     // Geo Filtering (Optional)
+//     if (maxDistance) {
+//         const distanceMiles = Number(maxDistance);
+//         if (isNaN(distanceMiles) || distanceMiles <= 0) {
+//             throw new ApiError(400, "Invalid max distance.");
+//         }
+
+//         const employer = await Employer.findOne({ authId }).lean();
+//         if (!employer) {
+//             throw new ApiError(404, "Access denied. Only employers are allowed.");
+//         }
+
+//         const coords = employer?.locations?.coordinates;
+//         if (!Array.isArray(coords) || coords.length !== 2) {
+//             throw new ApiError(400, "Please set a valid location in your profile.");
+//         }
+
+//         const [longitude, latitude] = coords;
+//         const maxDistanceInMeters = distanceMiles * 1609.34;
+
+//         const geoCandidates = await User.aggregate([
+//             {
+//                 $geoNear: {
+//                     near: {
+//                         type: "Point",
+//                         coordinates: [longitude, latitude]
+//                     },
+//                     distanceField: "distance",
+//                     spherical: true,
+//                     maxDistance: maxDistanceInMeters,
+//                     key: "locations"
+//                 }
+//             },
+//             { $match: filter },
+//             { $sort: { createdAt: -1 } },
+//             { $skip: skip },
+//             { $limit: limitNum },
+//             {
+//                 $project: {
+//                     name: 1,
+//                     email: 1,
+//                     job_title: 1,
+//                     profile_image: 1,
+//                     skill: 1,
+//                     details: 1,
+//                     address: 1,
+//                     experience: 1,
+//                     profile_private: 1,
+//                     profile_access: 1,
+//                     favorite: 1
+//                 }
+//             }
+//         ]);
+
+//         const total = await User.countDocuments(filter);
+
+//         const result = geoCandidates.map((u: any) => {
+//             const hasAccess = u.profile_access?.some((entry: any) =>
+//                 entry.eId?.toString() === userId && entry.access === true
+//             );
+//             if (hasAccess) u.profile_private = false;
+//             delete u.profile_access;
+
+//             const isFavorite = Array.isArray(u.favorite) &&
+//                 u.favorite.some((id: any) => id.toString() === authId?.toString());
+//             const { favorite, ...userData } = u;
+//             return { ...userData, isFavorite };
+//         });
+
+//         return {
+//             result,
+//             meta: {
+//                 total,
+//                 page: pageNum,
+//                 limit: limitNum,
+//                 totalPages: Math.ceil(total / limitNum)
+//             }
+//         };
+//     }
+
+//     const users = await User.find(filter)
+//         .select('name email profile_image skill details address profile_private profile_access favorite job_title experience')
+//         .skip(skip)
+//         .limit(limitNum)
+//         .lean();
+
+//     const total = await User.countDocuments(filter);
+
+//     let result = users.map((u: any) => {
+//         const hasAccess = u.profile_access?.some((entry: any) =>
+//             entry.eId?.toString() === userId && entry.access === true
+//         );
+//         if (hasAccess) u.profile_private = false;
+//         delete u.profile_access;
+
+//         const isFavorite = Array.isArray(u.favorite) &&
+//             u.favorite.some((id: any) => id.toString() === authId?.toString());
+
+//         const { favorite, ...userData } = u;
+//         return { ...userData, isFavorite };
+//     });
+
+//     return {
+//         result,
+//         meta: {
+//             total,
+//             page: pageNum,
+//             limit: limitNum,
+//             totalPages: Math.ceil(total / limitNum)
+//         }
+//     };
+// };
+
+
 const searchCandidate = async (user: IReqUser, query: any) => {
     const {
         page = 1,
@@ -786,7 +941,11 @@ const searchCandidate = async (user: IReqUser, query: any) => {
     const limitNum = parseInt(limit, 10);
     const skip = (pageNum - 1) * limitNum;
 
-    const filter: any = {};
+    const filter: any = {
+        status: "active"
+    };
+
+    console.log("filter", filter)
 
     const parseArray = (value: any): any[] => {
         if (!value) return [];
@@ -811,7 +970,19 @@ const searchCandidate = async (user: IReqUser, query: any) => {
         ];
     }
 
-    // Geo Filtering (Optional)
+    const calcCompletion = (u: any): number => {
+        const required = [
+            "name", "email", "job_title", "profile_image",
+            "skill", "details", "address", "experience", "resume", "locations", "availabil_date",
+        ];
+        const filled = required.filter(k => {
+            const val = u[k];
+            return Array.isArray(val) ? val.length > 0 : !!val;
+        }).length;
+        return (filled / required.length) * 100;
+    };
+
+    // ===== Geo Filtering =====
     if (maxDistance) {
         const distanceMiles = Number(maxDistance);
         if (isNaN(distanceMiles) || distanceMiles <= 0) {
@@ -867,7 +1038,10 @@ const searchCandidate = async (user: IReqUser, query: any) => {
 
         const total = await User.countDocuments(filter);
 
-        const result = geoCandidates.map((u: any) => {
+        const filtered = geoCandidates.filter((u: any) => calcCompletion(u) >= 75);
+        console.log("filtered", filtered)
+
+        const result = filtered.map((u: any) => {
             const hasAccess = u.profile_access?.some((entry: any) =>
                 entry.eId?.toString() === userId && entry.access === true
             );
@@ -876,6 +1050,7 @@ const searchCandidate = async (user: IReqUser, query: any) => {
 
             const isFavorite = Array.isArray(u.favorite) &&
                 u.favorite.some((id: any) => id.toString() === authId?.toString());
+
             const { favorite, ...userData } = u;
             return { ...userData, isFavorite };
         });
@@ -891,6 +1066,7 @@ const searchCandidate = async (user: IReqUser, query: any) => {
         };
     }
 
+    // ===== Non-Geo Filtering =====
     const users = await User.find(filter)
         .select('name email profile_image skill details address profile_private profile_access favorite job_title experience')
         .skip(skip)
@@ -899,7 +1075,9 @@ const searchCandidate = async (user: IReqUser, query: any) => {
 
     const total = await User.countDocuments(filter);
 
-    let result = users.map((u: any) => {
+    const filtered = users.filter((u: any) => calcCompletion(u) >= 75);
+
+    const result = filtered.map((u: any) => {
         const hasAccess = u.profile_access?.some((entry: any) =>
             entry.eId?.toString() === userId && entry.access === true
         );

@@ -17,7 +17,7 @@ router.get('/all/employer',
     JobsController.getEmployerJobs);
 router.post('/apply/:jobId',
     auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.ADMIN),
-    uploadC.single('resume'),
+    // uploadC.single('resume'),
     JobsController.applyJobs);
 router.get('/applications',
     auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),

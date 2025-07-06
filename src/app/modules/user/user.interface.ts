@@ -29,6 +29,7 @@ export interface IUser extends Document {
   experience: string;
   availability: string[];
   education: string;
+  availabil_date: Date,
   profile_private: boolean;
   address: string;
   profile_access: {
