@@ -15,16 +15,17 @@ const notificationSchema = new Schema<INotification>(
     },
     senderId: {
       type: Schema.Types.ObjectId,
-      required: true,
       refPath: 'senderIdType',
     },
     senderIdType: {
       type: String,
       enum: ["User", "Admin", "Employer"],
-      required: true,
     },
     admin: {
       type: Boolean,
+    },
+    type: {
+      type: String,
     },
     title: {
       type: String,

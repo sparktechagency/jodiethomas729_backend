@@ -11,4 +11,5 @@ export interface INotification {
   status: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  type: string;
 }

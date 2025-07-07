@@ -16,7 +16,7 @@ export const jobValidationSchema = z.object({
     experience: z.enum(
         [
             'freshers', '1_2_years', '2_4_years',
-            '4_6_years', '6_8_years', '8_10_years', '10plus',
+            '4_6_years', '6_8_years', '8_10_years', '10plus', "n/a",
         ],
         { errorMap: () => ({ message: 'Invalid experience level selected' }) }
     ),
