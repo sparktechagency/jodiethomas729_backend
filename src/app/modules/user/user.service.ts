@@ -225,6 +225,8 @@ const uploadCandidateCV = async (req: RequestData) => {
 
   const resume_url = files.path;
 
+  console.log("resume_url", resume_url)
+
 
   const updatedUser = await User.findByIdAndUpdate(
     userId,

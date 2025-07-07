@@ -11,6 +11,10 @@ export const app: Application = express();
 app.use(
   cors({
     origin: [
+      "https://dashboard.machmakers.co.uk",
+      "https://www.dashboard.machmakers.co.uk",
+      "https://machmakers.co.uk",
+      "https://www.machmakers.co.uk",
       'http://192.168.10.16:3000',
       "http://localhost:5173",
       "http://localhost:3000",
@@ -19,10 +23,7 @@ app.use(
       "http://localhost:3003",
       "http://13.53.182.102:4173",
       "http://13.53.182.102:3000",
-      "https://dashboard.machmakers.co.uk",
-      "https://www.dashboard.machmakers.co.uk",
-      "https://machmakers.co.uk",
-      "https://www.machmakers.co.uk",
+
     ],
     credentials: true,
   }),

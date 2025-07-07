@@ -8,6 +8,7 @@ import { UserController } from '../user/user.controller';
 import { EmployerController } from '../employer/employer.controller';
 import { DashboardController } from '../dashboard/dashboard.controller';
 import uploadC from '../../middlewares/cloudinaryUpload';
+import { resumeUpload } from '../../middlewares/catchMulter';
 
 const router = express.Router();
 //------ Auth Route -----------------
@@ -97,7 +98,8 @@ router.patch(
 router.patch(
   "/candidate_resume_upload",
   auth(ENUM_USER_ROLE.USER),
-  uploadC.single('resume'),
+  // uploadC.single('resume'),
+  resumeUpload(),
   UserController.uploadCandidateCV);
 
 router.patch(
