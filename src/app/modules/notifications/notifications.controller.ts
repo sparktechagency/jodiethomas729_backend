@@ -7,7 +7,7 @@ import { IReqUser } from '../auth/auth.interface';
 //get notification only for admin
 const getNotifications: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await NotificationService.getNotifications();
+    const result = await NotificationService.getNotifications(req.user as IReqUser);
     sendResponse(res, {
       statusCode: 200,
       success: true,

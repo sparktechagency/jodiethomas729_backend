@@ -4,8 +4,9 @@ import ApiError from '../../../errors/ApiError';
 import { IReqUser } from '../auth/auth.interface';
 
 //Get
-const getNotifications = async () => {
-  const allNotification = await Notification.find({ admin: true }).sort({
+const getNotifications = async (user: IReqUser) => {
+  const { userId } = user;
+  const allNotification = await Notification.find({ userId }).sort({
     createdAt: -1,
   });
   return {
