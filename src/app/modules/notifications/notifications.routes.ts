@@ -6,14 +6,9 @@ import { ENUM_USER_ROLE } from '../../../enums/user';
 const router = express.Router();
 
 router.get(
-  '/get-all-notifications',
+  '/my-notifications',
   auth(ENUM_USER_ROLE.USER, ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
   NotificationController.getNotifications,
-);
-router.get(
-  '/my-notifications',
-  auth(ENUM_USER_ROLE.USER),
-  NotificationController.myNotification,
 );
 router.patch(
   '/update-notification',

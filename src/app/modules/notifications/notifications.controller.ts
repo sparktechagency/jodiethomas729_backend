@@ -39,19 +39,6 @@ const updateAll: RequestHandler = catchAsync(
     });
   },
 );
-const myNotification: RequestHandler = catchAsync(
-  async (req: Request, res: Response) => {
-    const result = await NotificationService.myNotification(
-      req.user as IReqUser,
-    );
-    sendResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: `Notification retrieved successfully`,
-      data: result,
-    });
-  },
-);
 
 const deleteNotifications: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
@@ -68,7 +55,6 @@ const deleteNotifications: RequestHandler = catchAsync(
 export const NotificationController = {
   getNotifications,
   updateNotification,
-  myNotification,
   updateAll,
   deleteNotifications,
 };

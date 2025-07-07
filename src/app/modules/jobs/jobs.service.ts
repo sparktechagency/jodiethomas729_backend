@@ -973,7 +973,8 @@ const searchCandidate = async (user: IReqUser, query: any) => {
     const calcCompletion = (u: any): number => {
         const required = [
             "name", "email", "job_title", "profile_image",
-            "skill", "details", "address", "experience", "resume", "locations", "availabil_date",
+            "skill", "details", "address", "experience", "resume", "locations",
+            // "availabil_date",
         ];
         const filled = required.filter(k => {
             const val = u[k];

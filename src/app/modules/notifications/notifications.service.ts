@@ -48,14 +48,11 @@ const updateAll = async () => {
   return result;
 };
 
-const myNotification = async (user: IReqUser) => {
-  return await Notification.find({ user: user.userId }).sort({ createdAt: -1 });
-};
+
 
 export const NotificationService = {
   getNotifications,
   updateNotification,
-  myNotification,
   updateAll,
   deleteNotifications,
 };
