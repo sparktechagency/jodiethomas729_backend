@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import nodemailer, { Transporter } from 'nodemailer'; 
+import nodemailer, { Transporter } from 'nodemailer';
 import config from '../config';
 import { formattedDate } from './utils';
 import { IEmailOptions } from '../app/modules/auth/auth.interface';
@@ -13,14 +13,14 @@ const sendEmail = async (options: IEmailOptions): Promise<void> => {
       pass: config.smtp.smtp_password,
     },
   });
-  
+
   const { email, subject, html } = options;
 
   const mailOptions = {
     from: `${config.smtp.NAME} <${config.smtp.smtp_mail}>`,
     to: email,
     date: formattedDate,
-    signed_by: 'bdCalling.com',
+    signed_by: 'hello@machmakers.com',
     subject,
     html,
   };

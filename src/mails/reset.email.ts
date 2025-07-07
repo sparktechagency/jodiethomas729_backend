@@ -95,7 +95,7 @@ const resetEmailTemplate = (data: ResetEmailTemplateData): string => `
           </div>
           <div class="footer">
             <p>&copy; ${new Date().getFullYear()} ${config.app_name} App. All rights reserved.</p>
-            <p><a href="https://yourwebsite.com/privacy">Privacy Policy</a> | <a href="https://yourwebsite.com/contact">Contact Support</a></p>
+            <p><a href="https://machmakers.co.uk/terms-condition">Privacy Policy</a> | <a href="https://machmakers.co.uk/contact">Contact Support</a></p>
           </div>
         </div>
       </body>

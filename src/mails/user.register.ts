@@ -52,13 +52,13 @@ export const registrationSuccessEmailBody = (userData: any) => `
     </head>
     <body>
       <div class="container">
-        <h1>Welcome to ${config.app_name} App</h1>
+        <h1>Welcome to ${config.app_name}</h1>
         <p>Hello ${userData?.user?.name},</p>
-        <p>Thank you for registering with ${config.app_name} App. To activate your account, please use the following activation code:</p>
+        <p>Thank you for registering with ${config.app_name}. To activate your account, please use the following activation code:</p>
         <h1>${userData?.activationCode}</h1>
         <p>Please enter this code on the activation page within the next 5 minutes.</p>
-        <p>If you didn't register for ${config.app_name} App, please ignore this email.</p>
-        <p>If you have any questions, please contact us at <a href="mailto:tutoring@app.com">tutoring@app.com</a>.</p>
+        <p>If you didn't register for ${config.app_name}, please ignore this email.</p>
+        <p>If you have any questions, please contact us at <a href="mailto:hello@machmakers.com">hello@machmakers.com</a>.</p>
       </div>
     </body>
   </html>
