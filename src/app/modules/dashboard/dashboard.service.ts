@@ -261,6 +261,14 @@ const createSubscriptions = async (payload: ISubscriptions) => {
 
 const updateSubscription = async (id: string, payload: Partial<ISubscriptions>) => {
     try {
+        if (payload?.validation === "Monthly") {
+            payload.duration = 30 // days
+        } else if (payload?.validation === "Yearly") {
+            payload.duration = 365 // days
+        } else {
+            throw new ApiError(404, "Invalids 'validation' types. should - Monthly / Yearly")
+        }
+
         const updatedSubscription = await Subscription.findByIdAndUpdate(id, payload, { new: true });
         if (!updatedSubscription) {
             throw new ApiError(404, 'Subscription not found');
