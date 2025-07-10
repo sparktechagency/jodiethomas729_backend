@@ -74,63 +74,91 @@ const handleMessageData = async (
         const { receiverId, text } = data;
 
         if (!receiverId || !text) {
-            socket.emit("error", { message: "ReceiverId or text is missing!" });
+            socket.emit("error", { message: "Receiver ID or message text is missing!" });
             return;
         }
 
-        // console.log("=========", receiverId, text)
+        try {
+            // Check if conversation exists
+            let conversation = await Conversation.findOne({
+                participants: { $all: [receiverId, senderId] },
+            });
 
-        let conversation = await Conversation.findOne({
-            participants: { $all: [receiverId, senderId] },
-        });
+            // If not, create a new one
+            if (!conversation) {
+                const receiverExists = await Auth.exists({ _id: receiverId });
+                if (!receiverExists) {
+                    socket.emit("error", { message: "The receiver does not exist in our app!" });
+                    return;
+                }
 
-        if (!conversation) {
-            const checkDb = await Auth.findById(receiverId)
-            if (!checkDb) {
-                socket.emit("error", { message: "The receiver user not exist in our app!" });
-                return;
+                conversation = await Conversation.create({
+                    participants: [receiverId, senderId],
+                });
             }
 
-            conversation = await Conversation.create({
-                participants: [receiverId, senderId],
-            });
-        }
-
-        const newMessage = new Message({
-            senderId,
-            receiverId,
-            message: text,
-            conversationId: conversation._id,
-        });
-
-        conversation.messages.push(newMessage._id);
-        await Promise.all([conversation.save(), newMessage.save()]);
-
-        // ==========================
-        const messages = await Conversation.findOne({
-            participants: { $all: [senderId, receiverId] },
-        })
-            .populate({
-                path: 'messages',
-                // options: {
-                //     sort: { createdAt: -1 },
-                //     skip: (page - 1) * 20,
-                //     limit: 20,
-                // },
-                populate: [
-                    { path: 'senderId', select: 'name email profile_image' },
-                    { path: 'receiverId', select: 'name email profile_image' }
-                ]
+            // Save new message
+            const newMessage = await Message.create({
+                senderId,
+                receiverId,
+                message: text,
+                conversationId: conversation._id,
             });
 
-        if (messages) {
-            await emitMessage(senderId, messages, ENUM_SOCKET_EVENT.MESSAGE_GETALL)
-        }
+            // Push message to conversation
+            conversation.messages.push(newMessage._id);
+            await conversation.save();
 
-        // =========================== 
-        await emitMessage(senderId, newMessage, `${ENUM_SOCKET_EVENT.MESSAGE_NEW}/${receiverId}`);
-        await emitMessage(receiverId, newMessage, `${ENUM_SOCKET_EVENT.MESSAGE_NEW}/${senderId}`);
+            // Get full message thread with populated fields
+            const fullConversation = await Conversation.findById(conversation._id)
+                .populate({
+                    path: 'messages',
+                    populate: [
+                        { path: 'senderId', select: 'name email profile_image' },
+                        { path: 'receiverId', select: 'name email profile_image' },
+                    ]
+                });
+
+            // Emit updated messages to sender
+            if (fullConversation) {
+                await emitMessage(senderId, fullConversation, ENUM_SOCKET_EVENT.MESSAGE_GETALL);
+            }
+
+            // Fetch updated conversations for both users
+            const updateConversations = async (userId: string) => {
+                const list = await Conversation.find({
+                    participants: userId,
+                    orderId: null,
+                })
+                    .sort({ updatedAt: -1 })
+                    .populate({
+                        path: 'participants',
+                        select: 'name email profile_image',
+                    })
+                    .populate({ path: 'messages' });
+
+                return list;
+            };
+
+            const [senderConversations, receiverConversations] = await Promise.all([
+                updateConversations(senderId),
+                updateConversations(receiverId),
+            ]);
+
+            // Emit updates to both users
+            await emitMessage(senderId, senderConversations, ENUM_SOCKET_EVENT.CONVERSION);
+            await emitMessage(receiverId, receiverConversations, ENUM_SOCKET_EVENT.CONVERSION);
+
+            // Emit the new message to both users
+            await emitMessage(senderId, newMessage, `${ENUM_SOCKET_EVENT.MESSAGE_NEW}/${receiverId}`);
+            await emitMessage(receiverId, newMessage, ENUM_SOCKET_EVENT.MESSAGE_NEW);
+
+        } catch (error: any) {
+            console.error("Socket MESSAGE_NEW error:", error);
+            socket.emit("error", { message: "Something went wrong while sending the message." });
+        }
     });
+
 
     // Get Conversation List
     socket.on(ENUM_SOCKET_EVENT.CONVERSION, async () => {

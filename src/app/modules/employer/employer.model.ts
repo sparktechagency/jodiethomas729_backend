@@ -9,11 +9,11 @@ const SocialMediaSchema = new Schema<ISocialMedia>({
 });
 
 const CompanySchema = new Schema<ICompany>({
-  company_logo: { type: String, required: true },
-  name: { type: String, required: true },
-  employer_position: { type: String, required: true },
-  locations: { type: String, required: true },
-  details: { type: String, required: true },
+  company_logo: { type: String, },
+  name: { type: String, },
+  employer_position: { type: String, },
+  locations: { type: String, },
+  details: { type: String, },
   website_link: { type: String, default: null },
 });
 
@@ -25,7 +25,6 @@ const locationSchema = new Schema({
   },
   coordinates: {
     type: [Number],
-    required: true,
   },
 });
 

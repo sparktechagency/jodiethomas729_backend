@@ -24,6 +24,7 @@ const socket = (io: Server) => {
     // Add the user to the online users set
     onlineUsers.add(currentUserId);
     io.emit("onlineUser", Array.from(onlineUsers));
+    console.log("onlineUsers", onlineUsers)
 
     // Handle message events
     await handleMessageData(currentUserId, socket, io);

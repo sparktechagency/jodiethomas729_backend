@@ -43,7 +43,6 @@ const WorkExSchema = new Schema<IWorkExperience>({
   },
   location: {
     type: String,
-    required: true,
   },
   end_date: {
     type: Date,

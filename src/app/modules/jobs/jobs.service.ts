@@ -932,20 +932,17 @@ const searchCandidate = async (user: IReqUser, query: any) => {
         education,
         experience,
         searchTrams,
-        maxDistance
+        maxDistance,
     } = query;
 
     const { userId, authId } = user;
 
     const pageNum = parseInt(page, 10);
     const limitNum = parseInt(limit, 10);
-    const skip = (pageNum - 1) * limitNum;
 
     const filter: any = {
-        status: "active"
+        status: "active",
     };
-
-    console.log("filter", filter)
 
     const parseArray = (value: any): any[] => {
         if (!value) return [];
@@ -972,54 +969,69 @@ const searchCandidate = async (user: IReqUser, query: any) => {
 
     const calcCompletion = (u: any): number => {
         const required = [
-            "name", "email", "job_title", "profile_image",
-            "skill", "details", "address", "experience", "resume", "locations",
-            // "availabil_date",
+            "name",
+            "email",
+            "job_title",
+            "profile_image",
+            "skill",
+            "details",
+            "address",
+            "experience",
+            "resume",
+            "locations",
         ];
-        const filled = required.filter(k => {
+        const filled = required.filter((k) => {
             const val = u[k];
             return Array.isArray(val) ? val.length > 0 : !!val;
         }).length;
         return (filled / required.length) * 100;
     };
 
-    // ===== Geo Filtering =====
+    const paginate = (items: any[], page: number, limit: number) => {
+        const total = items.length;
+        const totalPages = Math.ceil(total / limit);
+        const start = (page - 1) * limit;
+        const paginated = items.slice(start, start + limit);
+        return { paginated, total, totalPages };
+    };
+
+    const mapResult = (users: any[]) => {
+        return users.map((u: any) => {
+            const hasAccess = u.profile_access?.some(
+                (entry: any) => entry.eId?.toString() === userId && entry.access === true
+            );
+            if (hasAccess) u.profile_private = false;
+            delete u.profile_access;
+
+            const isFavorite =
+                Array.isArray(u.favorite) &&
+                u.favorite.some((id: any) => id.toString() === authId?.toString());
+
+            const { favorite, ...userData } = u;
+            return { ...userData, isFavorite };
+        });
+    };
+
+    let allUsers: any[] = [];
+
     if (maxDistance) {
-        const distanceMiles = Number(maxDistance);
-        if (isNaN(distanceMiles) || distanceMiles <= 0) {
-            throw new ApiError(400, "Invalid max distance.");
-        }
-
         const employer = await Employer.findOne({ authId }).lean();
-        if (!employer) {
-            throw new ApiError(404, "Access denied. Only employers are allowed.");
+        if (!employer || !Array.isArray(employer?.locations?.coordinates)) {
+            throw new ApiError(400, "Employer location not set properly.");
         }
 
-        const coords = employer?.locations?.coordinates;
-        if (!Array.isArray(coords) || coords.length !== 2) {
-            throw new ApiError(400, "Please set a valid location in your profile.");
-        }
-
-        const [longitude, latitude] = coords;
-        const maxDistanceInMeters = distanceMiles * 1609.34;
-
-        const geoCandidates = await User.aggregate([
+        const [lng, lat] = employer.locations.coordinates;
+        const geoQuery = await User.aggregate([
             {
                 $geoNear: {
-                    near: {
-                        type: "Point",
-                        coordinates: [longitude, latitude]
-                    },
+                    near: { type: "Point", coordinates: [lng, lat] },
                     distanceField: "distance",
                     spherical: true,
-                    maxDistance: maxDistanceInMeters,
-                    key: "locations"
-                }
+                    maxDistance: Number(maxDistance) * 1609.34,
+                    key: "locations",
+                },
             },
             { $match: filter },
-            { $sort: { createdAt: -1 } },
-            { $skip: skip },
-            { $limit: limitNum },
             {
                 $project: {
                     name: 1,
@@ -1032,65 +1044,26 @@ const searchCandidate = async (user: IReqUser, query: any) => {
                     experience: 1,
                     profile_private: 1,
                     profile_access: 1,
-                    favorite: 1
-                }
-            }
+                    favorite: 1,
+                },
+            },
         ]);
-
-        const total = await User.countDocuments(filter);
-
-        const filtered = geoCandidates.filter((u: any) => calcCompletion(u) >= 75);
-        console.log("filtered", filtered)
-
-        const result = filtered.map((u: any) => {
-            const hasAccess = u.profile_access?.some((entry: any) =>
-                entry.eId?.toString() === userId && entry.access === true
-            );
-            if (hasAccess) u.profile_private = false;
-            delete u.profile_access;
-
-            const isFavorite = Array.isArray(u.favorite) &&
-                u.favorite.some((id: any) => id.toString() === authId?.toString());
-
-            const { favorite, ...userData } = u;
-            return { ...userData, isFavorite };
-        });
-
-        return {
-            result,
-            meta: {
-                total,
-                page: pageNum,
-                limit: limitNum,
-                totalPages: Math.ceil(total / limitNum)
-            }
-        };
+        allUsers = geoQuery;
+    } else {
+        allUsers = await User.find(filter)
+            .select(
+                "name email profile_image skill details address profile_private profile_access favorite job_title experience"
+            )
+            .lean();
     }
 
-    // ===== Non-Geo Filtering =====
-    const users = await User.find(filter)
-        .select('name email profile_image skill details address profile_private profile_access favorite job_title experience')
-        .skip(skip)
-        .limit(limitNum)
-        .lean();
-
-    const total = await User.countDocuments(filter);
-
-    const filtered = users.filter((u: any) => calcCompletion(u) >= 75);
-
-    const result = filtered.map((u: any) => {
-        const hasAccess = u.profile_access?.some((entry: any) =>
-            entry.eId?.toString() === userId && entry.access === true
-        );
-        if (hasAccess) u.profile_private = false;
-        delete u.profile_access;
-
-        const isFavorite = Array.isArray(u.favorite) &&
-            u.favorite.some((id: any) => id.toString() === authId?.toString());
-
-        const { favorite, ...userData } = u;
-        return { ...userData, isFavorite };
-    });
+    const completedUsers = allUsers.filter((u) => calcCompletion(u) >= 75);
+    const { paginated, total, totalPages } = paginate(
+        completedUsers,
+        pageNum,
+        limitNum
+    );
+    const result = mapResult(paginated);
 
     return {
         result,
@@ -1098,8 +1071,8 @@ const searchCandidate = async (user: IReqUser, query: any) => {
             total,
             page: pageNum,
             limit: limitNum,
-            totalPages: Math.ceil(total / limitNum)
-        }
+            totalPages,
+        },
     };
 };
 
