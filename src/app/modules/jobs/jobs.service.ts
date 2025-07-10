@@ -1066,6 +1066,7 @@ const searchCandidate = async (user: IReqUser, query: any) => {
     const start = (pageNum - 1) * limitNum;
     const paginated = completedUsers.slice(start, start + limitNum);
     const result = mapResult(paginated)
+    console.log("===============")
 
     return {
         result,
