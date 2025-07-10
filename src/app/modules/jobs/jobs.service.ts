@@ -453,6 +453,7 @@ const getRecentJobs = async (query: any) => {
             };
         });
     }
+    console.log("", meta)
     return { result, meta };
 };
 
@@ -1057,18 +1058,19 @@ const searchCandidate = async (user: IReqUser, query: any) => {
             .lean();
     }
 
+
+
     const completedUsers = allUsers.filter((u) => calcCompletion(u) >= 75);
-    const { paginated, total, totalPages } = paginate(
-        completedUsers,
-        pageNum,
-        limitNum
-    );
-    const result = mapResult(paginated);
+    const filteredTotal = completedUsers.length;
+    const totalPages = Math.ceil(filteredTotal / limitNum);
+    const start = (pageNum - 1) * limitNum;
+    const paginated = completedUsers.slice(start, start + limitNum);
+    const result = mapResult(paginated)
 
     return {
         result,
         meta: {
-            total,
+            total: filteredTotal,
             page: pageNum,
             limit: limitNum,
             totalPages,
