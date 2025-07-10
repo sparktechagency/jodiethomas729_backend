@@ -46,6 +46,11 @@ const EmployerSchema = new Schema<IEmployer>({
     type: String,
     default: null
   },
+  plan_id: {
+    type: Schema.Types.ObjectId,
+    ref: "Subscription",
+    default: null,
+  },
   locations: {
     type: locationSchema,
   },

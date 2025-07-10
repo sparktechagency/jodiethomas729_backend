@@ -42,4 +42,5 @@ export type IEmployer = Document & {
   locations: any;
   details: String;
   address: String;
+  plan_id: mongoose.Schema.Types.ObjectId;
 }

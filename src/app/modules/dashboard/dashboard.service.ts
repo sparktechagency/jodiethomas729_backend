@@ -223,7 +223,7 @@ const checkActiveSubscriber = async (user: IReqUser) => {
             throw new ApiError(401, `You are not unauthorized for access. Must need role EMPLOYER.`);
         }
 
-        const employer = await Employer.findById(userId).select("authId name email subscription_status duration_time");
+        const employer = await Employer.findById(userId).select("authId name email subscription_status duration_time plan_id");
 
         if (!employer) {
             throw new ApiError(404, "Employer not found.");

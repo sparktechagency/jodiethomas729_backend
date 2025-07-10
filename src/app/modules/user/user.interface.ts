@@ -39,6 +39,7 @@ export interface IUser extends Document {
   favorite: mongoose.Types.ObjectId[];
   locations: any;
   resume: string | undefined;
+  plan_id: mongoose.Types.ObjectId;
 }
 
 export interface IEducational {

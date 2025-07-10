@@ -16,6 +16,7 @@ app.use(
       "https://machmakers.co.uk",
       "https://www.machmakers.co.uk",
       'http://192.168.10.16:3000',
+      "http://10.0.60.210:3000",
       "http://localhost:5173",
       "http://localhost:3000",
       "http://localhost:3001",

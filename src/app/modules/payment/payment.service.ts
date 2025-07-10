@@ -26,7 +26,7 @@ cron.schedule("0 0 */12 * * *", async () => {
                 duration_time: { $lte: now },
             },
             {
-                $set: { subscription_status: "Expired" },
+                $set: { subscription_status: "Expired", plan_id: null },
             }
         );
         console.log("********************************************************=======================================================================###################################################**************************************************************************")
@@ -167,10 +167,12 @@ const stripeCheckAndUpdateStatusSuccess = async (req: any) => {
             expiryDate.setMonth(expiryDate.getMonth() + 1);
             user.duration_time = expiryDate;
             user.subscription_status = "Active";
+            user.plan_id = subscriptionId;
         } else if (subscription.validation === "Yearly") {
             expiryDate.setFullYear(expiryDate.getFullYear() + 1);
             user.duration_time = expiryDate;
             user.subscription_status = "Active";
+            user.plan_id = subscriptionId;
         } else {
             user.subscription_status = "None";
         }
