@@ -18,6 +18,9 @@ const handleMessageData = async (
     }) => {
         const { receiverId, page } = data as any;
 
+        console.log("===", receiverId, page)
+        console.log("senderId", senderId)
+
         if (!receiverId) {
             socket.emit('error', {
                 message: 'SenderId not found!',
@@ -25,26 +28,44 @@ const handleMessageData = async (
             return;
         }
 
-        const conversation = await Conversation.findOne({
+        // const conversation = await Conversation.findOne({
+        //     participants: { $all: [senderId, receiverId] },
+        //     orderId: null
+        // })
+        //     .populate({
+        //         path: 'messages',
+        //         options: {
+        //             sort: { createdAt: -1 },
+        //             skip: (page - 1) * 20,
+        //             limit: 20,
+        //         },
+        //         populate: [
+        //             { path: 'senderId', select: 'name email profile_image' },
+        //             { path: 'receiverId', select: 'name email profile_image' }
+        //         ]
+        //     });
+        const messages = await Conversation.findOne({
             participants: { $all: [senderId, receiverId] },
             orderId: null
         })
             .populate({
                 path: 'messages',
-                options: {
-                    sort: { createdAt: -1 },
-                    skip: (page - 1) * 20,
-                    limit: 20,
-                },
+                // options: {
+                //     sort: { createdAt: -1 },
+                //     skip: (page - 1) * 20,
+                //     limit: 20,
+                // },
                 populate: [
                     { path: 'senderId', select: 'name email profile_image' },
                     { path: 'receiverId', select: 'name email profile_image' }
                 ]
             });
-        // receiverId
 
-        if (conversation) {
-            await emitMessage(senderId, conversation, `${ENUM_SOCKET_EVENT.MESSAGE_GETALL}/${receiverId}`)
+        // receiverId
+        console.log("conversation", messages)
+
+        if (messages) {
+            await emitMessage(senderId, messages, `${ENUM_SOCKET_EVENT.MESSAGE_GETALL}`)
         }
     },
     );
