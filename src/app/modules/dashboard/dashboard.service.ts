@@ -261,6 +261,7 @@ const createSubscriptions = async (payload: ISubscriptions) => {
 
 const updateSubscription = async (id: string, payload: Partial<ISubscriptions>) => {
     try {
+
         if (payload?.validation === "Monthly") {
             payload.duration = 30 // days
         } else if (payload?.validation === "Yearly") {

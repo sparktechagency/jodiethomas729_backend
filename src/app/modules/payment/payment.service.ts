@@ -20,7 +20,7 @@ const DOMAIN_URL = process.env.SERVER_PASS_UI_LINK;
 cron.schedule("0 0 */12 * * *", async () => {
     try {
         const now = new Date();
-        const result = await User.updateMany(
+        const result = await Employer.updateMany(
             {
                 subscription_status: "Active",
                 duration_time: { $lte: now },
@@ -71,7 +71,7 @@ const createCheckoutSessionStripe = async (req: any) => {
         let session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             mode: 'payment',
-            success_url: `${DOMAIN_URL}/payment/stripe-webhooks?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `${DOMAIN_URL}/payment/payment-success/{CHECKOUT_SESSION_ID}`,
             cancel_url: `${DOMAIN_URL}/cancel`,
             customer_email: `${user?.email}`,
             client_reference_id: subscriptionId,
