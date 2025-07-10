@@ -45,8 +45,7 @@ const handleMessageData = async (
         //         ]
         //     });
         const messages = await Conversation.findOne({
-            participants: { $all: [senderId, receiverId] },
-            orderId: null
+            participants: { $all: [senderId, receiverId] }
         })
             .populate({
                 path: 'messages',
@@ -110,7 +109,6 @@ const handleMessageData = async (
         // ==========================
         const messages = await Conversation.findOne({
             participants: { $all: [senderId, receiverId] },
-            orderId: null
         })
             .populate({
                 path: 'messages',
