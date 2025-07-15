@@ -44,6 +44,9 @@ export const jobValidationSchema = z.object({
         longitude: z.number({ invalid_type_error: 'Longitude must be a number' }),
         latitude: z.number({ invalid_type_error: 'Latitude must be a number' }),
     }),
+    postalCode: z
+        .string({ required_error: 'Postal code is required' })
+        .min(2, 'Postal code must be at least 2 characters long'),
 
     descriptions: z
         .string({ required_error: 'Job description is required' })

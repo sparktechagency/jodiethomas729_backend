@@ -10,7 +10,6 @@ const locationSchema = new Schema({
     },
     coordinates: {
         type: [Number],
-        required: true,
     },
 });
 
@@ -71,6 +70,7 @@ const JobsSchema = new Schema<IJobs>(
         },
         //city
         address: { type: String, required: true },
+        postalCode: { type: String, required: true },
 
 
     },

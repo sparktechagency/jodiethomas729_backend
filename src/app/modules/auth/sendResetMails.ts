@@ -13,7 +13,7 @@ export async function sendResetEmail(to: string, html: string) {
   });
 
   await transporter.sendMail({
-    from: config.smtp.smtp_mail,
+    from: `${config.smtp.NAME} <${config.smtp.smtp_mail}>`,
     to,
     subject: 'Reset Password Link',
     html,

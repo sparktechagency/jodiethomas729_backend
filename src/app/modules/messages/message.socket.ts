@@ -108,7 +108,7 @@ const handleMessageData = async (
             // Push message to conversation
             conversation.messages.push(newMessage._id);
             await conversation.save();
-
+            console.log("newMessage", newMessage)
             // Get full message thread with populated fields
             const fullConversation = await Conversation.findById(conversation._id)
                 .populate({
@@ -135,7 +135,7 @@ const handleMessageData = async (
                         path: 'participants',
                         select: 'name email profile_image',
                     })
-                    .populate({ path: 'messages' });
+                // .populate({ path: 'messages' });
 
                 return list;
             };
@@ -172,10 +172,10 @@ const handleMessageData = async (
                     path: 'participants',
                     select: 'name email profile_image',
                 })
-                .populate({
-                    path: 'messages',
-                    // options: { sort: { createdAt: -1 }, limit: 1 },
-                })
+                // .populate({
+                //     path: 'messages',
+                //     // options: { sort: { createdAt: -1 }, limit: 1 },
+                // })
                 .sort({ updatedAt: -1 });
 
 

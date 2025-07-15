@@ -22,7 +22,7 @@ const createNewJob = async (user: IReqUser, payload: IJobs) => {
 
         const locations = {
             type: 'Point',
-            coordinates: [parsedData.location.longitude, parsedData.location.latitude],
+            coordinates: [parsedData?.location.longitude, parsedData?.location.latitude],
         };
 
         const jobData = {
@@ -34,7 +34,8 @@ const createNewJob = async (user: IReqUser, payload: IJobs) => {
 
         // console.log('payload', jobData, authId)
         const job = new Jobs(jobData);
-        await job.save();
+        const data = await job.save();
+        console.log("========", data)
 
         // 🔔 Trigger job alert logic
         await sendJobAlerts(job);
@@ -456,7 +457,7 @@ const getRecentJobs = async (query: any) => {
     console.log("", meta)
     return { result, meta };
 };
-
+// =========================================
 // const getSearchFilterJobs = async (query: any) => {
 //     let { experience,
 //         types,
@@ -581,25 +582,201 @@ const getRecentJobs = async (query: any) => {
 //     };
 // };
 
+// const getSearchFilterJobs = async (query: any) => {
+//     let {
+//         experience,
+//         types,
+//         job_pattern,
+//         category,
+//         searchTrams,
+//         maxDistance,
+//         authId,
+//         page = 1,
+//         limit = 10,
+//         location,
+//         postalCode
+//     } = query;
+
+//     const matchStage: any = {
+//         status: "Active",
+//     };
+
+//     let latitude: number | undefined;
+//     let longitude: number | undefined;
+
+//     if (authId) {
+//         const user = await User.findOne({ authId }).lean() as any;
+//         if (!user) throw new ApiError(404, "Access denied. Only users are allowed.");
+//         const coords = user?.locations?.coordinates;
+//         if (!Array.isArray(coords) || coords.length !== 2) {
+//             throw new ApiError(400, "Please set your location in your profile.");
+//         }
+//         [longitude, latitude] = coords;
+//     }
+
+//     const parseArray = (value: any) => {
+//         try {
+//             const parsed = JSON.parse(value);
+//             return Array.isArray(parsed) ? parsed : [parsed];
+//         } catch {
+//             return Array.isArray(value) ? value : [value];
+//         }
+//     };
+
+//     if (experience) matchStage.experience = { $in: parseArray(experience) };
+//     if (types) matchStage.types = { $in: parseArray(types) };
+//     if (job_pattern) matchStage.job_pattern = { $in: parseArray(job_pattern) };
+//     if (category) matchStage.category = { $in: parseArray(category) };
+
+//     const textFilters: any[] = [];
+//     if (searchTrams) {
+//         const regex = new RegExp(searchTrams, "i");
+//         textFilters.push({ title: regex }, { skill: regex }, { address: regex });
+//     }
+//     if (location) {
+//         const regex = new RegExp(location, "i");
+//         textFilters.push({ address: regex });
+//     }
+//     if (postalCode) {
+//         const regex = new RegExp(postalCode, "i");
+//         textFilters.push({ postalCode: regex });
+//     }
+//     if (textFilters.length > 0) {
+//         matchStage.$or = textFilters;
+//     }
+
+//     const pageNum = parseInt(page);
+//     const limitNum = parseInt(limit);
+//     const skip = (pageNum - 1) * limitNum;
+
+//     let jobs = [];
+//     let total = 0;
+
+//     if (maxDistance) {
+//         if (!authId) throw new ApiError(404, "Please create an account to search jobs!");
+//         if (!latitude || !longitude) throw new ApiError(404, "Please set a valid location in your profile.");
+//         if (!Number(maxDistance)) throw new ApiError(404, "Invalid max distance.");
+
+//         const maxDistanceInMeters = Number(maxDistance) * 1609.34;
+
+//         const pipeline: any[] = [
+//             {
+//                 $geoNear: {
+//                     near: {
+//                         type: "Point",
+//                         coordinates: [longitude, latitude],
+//                     },
+//                     distanceField: "distance",
+//                     spherical: true,
+//                     maxDistance: maxDistanceInMeters,
+//                     key: "locations",
+//                 },
+//             },
+//             { $match: matchStage },
+//             { $sort: { createdAt: -1 } },
+//             { $skip: skip },
+//             { $limit: limitNum },
+//             {
+//                 $lookup: {
+//                     from: "categories",
+//                     localField: "category",
+//                     foreignField: "_id",
+//                     as: "category",
+//                 },
+//             },
+//             {
+//                 $lookup: {
+//                     from: "users",
+//                     localField: "userId",
+//                     foreignField: "_id",
+//                     as: "userId",
+//                 },
+//             },
+//             { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
+//             { $unwind: { path: "$userId", preserveNullAndEmptyArrays: true } },
+//             {
+//                 $project: {
+//                     title: 1,
+//                     category: 1,
+//                     locations: 1,
+//                     postalCode,
+//                     address: 1,
+//                     types: 1,
+//                     experience: 1,
+//                     education: 1,
+//                     createdAt: 1,
+//                     vacancies: 1,
+//                     application_dateline: 1,
+//                     salary: 1,
+//                     "userId.profile_image": 1,
+//                     "userId.company": 1,
+//                     "userId.name": 1,
+//                     favorite: 1,
+//                 },
+//             },
+//         ];
+
+//         jobs = await Jobs.aggregate(pipeline);
+//         total = await Jobs.countDocuments(matchStage);
+//     } else {
+//         const jobQuery = Jobs.find(matchStage)
+//             .select("title category postalCode locations address types experience education createdAt userId favorite application_dateline salary vacancies")
+//             .populate("category")
+//             .populate({
+//                 path: "userId",
+//                 select: "profile_image name company",
+//             })
+//             .sort({ createdAt: -1 })
+//             .skip(skip)
+//             .limit(limitNum)
+//             .lean();
+
+//         [jobs, total] = await Promise.all([
+//             jobQuery,
+//             Jobs.countDocuments(matchStage),
+//         ]);
+//     }
+
+//     const finalJobs = jobs.map((job: any) => {
+//         const isFavorite =
+//             Array.isArray(job.favorite) && authId
+//                 ? job.favorite.some((id: any) => id.toString() === authId.toString())
+//                 : false;
+//         const { favorite, ...rest } = job;
+//         return {
+//             ...rest,
+//             isFavorite,
+//         };
+//     });
+
+//     return {
+//         jobs: finalJobs,
+//         meta: {
+//             page: pageNum,
+//             limit: limitNum,
+//             total,
+//             totalPage: Math.ceil(total / limitNum),
+//         },
+//     };
+// };
+// =========================================
 const getSearchFilterJobs = async (query: any) => {
-    let { experience, types, job_pattern, category, searchTrams, maxDistance, authId, page = 1, limit = 10, } = query;
+    let {
+        experience,
+        types,
+        job_pattern,
+        category,
+        searchTrams,
+        authId,
+        page = 1,
+        limit = 10,
+        location,
+        postalCode,
+    } = query;
 
     const matchStage: any = {
         status: "Active",
     };
-
-    let latitude: number | undefined;
-    let longitude: number | undefined;
-
-    if (authId) {
-        const user = await User.findOne({ authId }).lean() as any;
-        if (!user) throw new ApiError(404, "Access denied. Only users are allowed.");
-        const coords = user?.locations?.coordinates;
-        if (!Array.isArray(coords) || coords.length !== 2) {
-            throw new ApiError(400, "Please set your location in your profile.");
-        }
-        [longitude, latitude] = coords;
-    }
 
     const parseArray = (value: any) => {
         try {
@@ -620,6 +797,14 @@ const getSearchFilterJobs = async (query: any) => {
         const regex = new RegExp(searchTrams, "i");
         textFilters.push({ title: regex }, { skill: regex }, { address: regex });
     }
+    if (location) {
+        const regex = new RegExp(location, "i");
+        textFilters.push({ address: regex });
+    }
+    if (postalCode) {
+        const regex = new RegExp(postalCode, "i");
+        textFilters.push({ postalCode: regex });
+    }
     if (textFilters.length > 0) {
         matchStage.$or = textFilters;
     }
@@ -628,92 +813,22 @@ const getSearchFilterJobs = async (query: any) => {
     const limitNum = parseInt(limit);
     const skip = (pageNum - 1) * limitNum;
 
-    let jobs = [];
-    let total = 0;
+    const jobQuery = Jobs.find(matchStage)
+        .select("title category postalCode locations address types experience education createdAt userId favorite application_dateline salary vacancies")
+        .populate("category")
+        .populate({
+            path: "userId",
+            select: "profile_image name company",
+        })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum)
+        .lean();
 
-    if (maxDistance) {
-        if (!authId) throw new ApiError(404, "Please create an account to search jobs!");
-        if (!latitude || !longitude) throw new ApiError(404, "Please set a valid location in your profile.");
-        if (!Number(maxDistance)) throw new ApiError(404, "Invalid max distance.");
-
-        const maxDistanceInMeters = Number(maxDistance) * 1609.34;
-
-        const pipeline: any[] = [
-            {
-                $geoNear: {
-                    near: {
-                        type: "Point",
-                        coordinates: [longitude, latitude],
-                    },
-                    distanceField: "distance",
-                    spherical: true,
-                    maxDistance: maxDistanceInMeters,
-                    key: "locations",
-                },
-            },
-            { $match: matchStage },
-            { $sort: { createdAt: -1 } },
-            { $skip: skip },
-            { $limit: limitNum },
-            {
-                $lookup: {
-                    from: "categories",
-                    localField: "category",
-                    foreignField: "_id",
-                    as: "category",
-                },
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "userId",
-                    foreignField: "_id",
-                    as: "userId",
-                },
-            },
-            { $unwind: { path: "$category", preserveNullAndEmptyArrays: true } },
-            { $unwind: { path: "$userId", preserveNullAndEmptyArrays: true } },
-            {
-                $project: {
-                    title: 1,
-                    category: 1,
-                    locations: 1,
-                    address: 1,
-                    types: 1,
-                    experience: 1,
-                    education: 1,
-                    createdAt: 1,
-                    vacancies: 1,
-                    application_dateline: 1,
-                    salary: 1,
-                    "userId.profile_image": 1,
-                    "userId.company": 1,
-                    "userId.name": 1,
-                    favorite: 1,
-                },
-            },
-        ];
-
-        jobs = await Jobs.aggregate(pipeline);
-        total = await Jobs.countDocuments(matchStage);
-    } else {
-        const jobQuery = Jobs.find(matchStage)
-            .select("title category locations address types experience education createdAt userId favorite application_dateline salary vacancies")
-            .populate("category")
-            .populate({
-                path: "userId",
-                select: "profile_image name company",
-            })
-            .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limitNum)
-            .lean();
-
-        [jobs, total] = await Promise.all([
-            jobQuery,
-            Jobs.countDocuments(matchStage),
-        ]);
-    }
+    const [jobs, total] = await Promise.all([
+        jobQuery,
+        Jobs.countDocuments(matchStage),
+    ]);
 
     const finalJobs = jobs.map((job: any) => {
         const isFavorite =
@@ -737,6 +852,7 @@ const getSearchFilterJobs = async (query: any) => {
         },
     };
 };
+
 
 const getJobsDetailsForCandidate = async (jobId: any) => {
 

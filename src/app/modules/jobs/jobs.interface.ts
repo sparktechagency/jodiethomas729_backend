@@ -22,6 +22,7 @@ export interface IJobs extends Document {
     rate: string;
     job_pattern: string;
     address: string;
+    postalCode: string;
 }
 
 
