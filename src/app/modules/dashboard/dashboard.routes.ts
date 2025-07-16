@@ -65,6 +65,28 @@ router.delete(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   DashboardController.deleteCategory,
 );
+// Banner =========================================
+router.post('/create-banner',
+  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  uploadFile(),
+  DashboardController.bannerInsertIntoDB,
+);
+router.get(
+  '/all-banner',
+  DashboardController.allBanner,
+);
+router.patch(
+  '/edit-banner/:id',
+  // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  uploadFile(),
+  DashboardController.updateBanner,
+);
+router.delete(
+  '/delete-banner/:id',
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  DashboardController.deleteBanner,
+);
+
 
 // =========================================
 router.get(

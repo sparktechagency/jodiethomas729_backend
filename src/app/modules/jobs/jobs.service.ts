@@ -123,6 +123,32 @@ const updateJobs = async (jobId: string, payload: Partial<IJobs>) => {
     }
 };
 
+
+const jobsDeleteById = async (jobId: string) => {
+    try {
+        if (!Types.ObjectId.isValid(jobId)) {
+            throw new ApiError(httpStatus.BAD_REQUEST, "Invalid job ID");
+        }
+
+        console.log('===', jobId)
+
+        const job = await Jobs.findById(jobId);
+        if (!job) {
+            throw new ApiError(httpStatus.NOT_FOUND, "Job not found");
+        }
+
+        await job.deleteOne();
+
+        return { message: "Job deleted successfully" };
+    } catch (error: any) {
+        throw new ApiError(
+            httpStatus.INTERNAL_SERVER_ERROR,
+            error.message || "Unexpected error while deleting job"
+        );
+    }
+};
+
+
 const getEmployerJobs = async (user: IReqUser, query: any) => {
     const { page, limit } = query;
     const { authId } = user;
@@ -1440,5 +1466,6 @@ export const JobsServices = {
     toggleUserFavorite,
     getUserFavoriteList,
     getTotalCountEmployer,
-    getTotalCountCandidate
+    getTotalCountCandidate,
+    jobsDeleteById
 }

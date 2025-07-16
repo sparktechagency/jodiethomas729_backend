@@ -125,6 +125,18 @@ const toggleFavorite = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const jobsDeleteById = catchAsync(async (req: Request, res: Response) => {
+    const jobId = req.params.jobId;
+    const result = await JobsServices.jobsDeleteById(jobId as any);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Delete Successfully",
+        data: result,
+    });
+});
+
+
 const getUserFavoritesJobs = catchAsync(async (req: Request, res: Response) => {
     const user = req.user as IReqUser;
     const result = await JobsServices.getUserFavoritesJobs(user);
@@ -213,6 +225,8 @@ const searchCandidate = catchAsync(async (req: Request, res: Response) => {
         data: result,
     });
 });
+
+
 
 const profileAccessRequest = catchAsync(async (req: Request, res: Response) => {
     const userId = req.params.userId;
@@ -323,5 +337,6 @@ export const JobsController = {
     toggleUserFavorite,
     getUserFavoriteList,
     getTotalCountEmployer,
-    getTotalCountCandidate
+    getTotalCountCandidate,
+    jobsDeleteById
 }

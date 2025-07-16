@@ -1,7 +1,7 @@
 import QueryBuilder from "../../../builder/QueryBuilder";
 import ApiError from "../../../errors/ApiError";
 import User from "../user/user.model";
-import { AboutUs, Blogs, Category, ContactUs, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
+import { AboutUs, Banner, Blogs, Category, ContactUs, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
 import { IBlog, ICategory, ISubscriptions } from "./dsashbaord.interface";
 import { logger } from "../../../shared/logger";
 import { Transaction } from "../payment/payment.model";
@@ -381,6 +381,63 @@ const deleteCategory = async (id: string) => {
     return await Category.findByIdAndDelete(id);
 };
 
+
+// ===================================
+const bannerInsertIntoDB = async (files: any, payload: ICategory) => {
+    if (!files?.image) {
+        throw new ApiError(400, 'File is missing');
+    }
+
+    if (files?.image) {
+        payload.image = `/images/image/${files.image[0].filename}`;
+    }
+
+    return await Banner.create(payload);
+};
+
+const allBanner = async (query: Record<string, unknown>) => {
+    const result = await Banner.find().sort({ createdAt: -1 })
+
+    return {
+        data: result,
+    };
+};
+
+const updateBanner = async (req: any) => {
+    const { files } = req as any;
+    const id = req.params.id;
+    const { ...AddsData } = req.body;
+
+    if (files && files.image) {
+        AddsData.image = `/images/image/${files.image[0].filename}`;
+    }
+
+    const isExist = await Banner.findOne({ _id: id });
+
+    if (!isExist) {
+        throw new ApiError(404, 'Adds not found !');
+    }
+
+    const result = await Banner.findOneAndUpdate(
+        { _id: id },
+        { ...AddsData },
+        {
+            new: true,
+        },
+    );
+
+    return result;
+};
+
+const deleteBanner = async (id: string) => {
+    const isExist = await Banner.findOne({ _id: id });
+    if (!isExist) {
+        throw new ApiError(404, 'Banner not found !');
+    }
+
+    return await Banner.findByIdAndDelete(id);
+};
+
 // ==============
 const addTermsConditions = async (payload: any) => {
     const checkIsExist = await TermsConditions.findOne();
@@ -462,8 +519,6 @@ const getEmployerDetails = async (query: any, userId: any) => {
     }
 
     const employer = await Employer.findById(userId)
-
-
     // query.userId = userId
 
     const userQuery = new QueryBuilder(Jobs.find({ userId })
@@ -516,8 +571,6 @@ const getCandidateDetails = async (query: any, userId: any) => {
     }
 
     const userDetails = await User.findById(userId)
-
-
     // query.userId = userId
 
     const userQuery = new QueryBuilder(Applications.find({ userId })
@@ -785,5 +838,9 @@ export const DashboardService = {
     getBlogDetailsAndRelated,
     postContactUs,
     getAllContactUs,
-    replyToContactUs
+    replyToContactUs,
+    deleteBanner,
+    updateBanner,
+    allBanner,
+    bannerInsertIntoDB
 };

@@ -61,6 +61,11 @@ router.get('/get_search_filter',
 router.get('/get_details/:jobId',
     JobsController.getJobsDetailsForCandidate
 );
+
+router.delete('/deletes/:jobId',
+    auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.EMPLOYER),
+    JobsController.jobsDeleteById
+);
 // =======================================
 router.get('/search_candidate',
     auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),

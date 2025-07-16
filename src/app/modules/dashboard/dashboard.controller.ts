@@ -2,7 +2,7 @@ import { Request, RequestHandler, Response } from 'express';
 import sendResponse from '../../../shared/sendResponse';
 import catchAsync from '../../../shared/catchasync';
 import { DashboardService } from './dashboard.service';
-import { IBlog, ICategory, ISubscriptions } from './dsashbaord.interface';
+import { IBanner, IBlog, ICategory, ISubscriptions } from './dsashbaord.interface';
 import { Subscription } from './dashboard.model';
 import { IReqUser } from '../auth/auth.interface';
 import ApiError from '../../../errors/ApiError';
@@ -164,6 +164,47 @@ const allCategory = catchAsync(async (req: Request, res: Response) => {
     statusCode: 200,
     success: true,
     message: 'Category Retrieved successfully',
+    data: result.data,
+  });
+});
+
+// ===============================================================
+const bannerInsertIntoDB = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.bannerInsertIntoDB(req.files, req.body);
+  sendResponse<IBanner>(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Banner create successfully',
+    data: result,
+  });
+});
+
+const updateBanner = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.updateBanner(req);
+  sendResponse<IBanner>(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Banner update successfully',
+    data: result,
+  });
+});
+
+const deleteBanner = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.deleteBanner(req.params.id);
+  sendResponse<IBanner>(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Banner delete successfully',
+    data: result,
+  });
+});
+
+const allBanner = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.allBanner(req.query);
+  sendResponse<IBanner[]>(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Banner Retrieved successfully',
     data: result.data,
   });
 });
@@ -487,5 +528,9 @@ export const DashboardController = {
   getBlogDetailsAndRelated,
   postContactUs,
   getAllContactUs,
-  replayTheContactUs
+  replayTheContactUs,
+  updateBanner,
+  allBanner,
+  bannerInsertIntoDB,
+  deleteBanner
 };

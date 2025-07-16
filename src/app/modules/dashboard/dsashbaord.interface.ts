@@ -74,6 +74,12 @@ export type ICategory = {
   category: string;
 };
 
+export type IBanner = {
+  image: string;
+  name: string;
+};
+
+
 export type IContactSupport = {
   name: string;
   email: string;

@@ -1,5 +1,5 @@
 import mongoose, { Model, Schema, Types } from "mongoose";
-import { IBlog, ICategory, IComment, IContactSupport, INutritional, IRecipe, IReview, ISubscriptions } from "./dsashbaord.interface";
+import { IBanner, IBlog, ICategory, IComment, IContactSupport, INutritional, IRecipe, IReview, ISubscriptions } from "./dsashbaord.interface";
 import { string } from "zod";
 
 
@@ -88,6 +88,19 @@ const termsAndConditionsSchema = new mongoose.Schema(
     }
 );
 
+const bannerSchema = new Schema<IBanner>(
+    {
+        name: {
+            type: String,
+            required: true,
+        },
+        image: {
+            type: String,
+            required: true,
+        },
+    }, { timestamps: true }
+);
+
 const privacyPolicySchema = new mongoose.Schema(
     {
         description: {
@@ -155,11 +168,12 @@ const Subscription: Model<ISubscriptions> = mongoose.model<ISubscriptions>('Subs
 const Comment: Model<IComment> = mongoose.model<IComment>('Comment', CommentSchema);
 const Review: Model<IReview> = mongoose.model<IReview>('Review', ReviewSchema);
 const Category: Model<ICategory> = mongoose.model<ICategory>('Category', categorySchema);
+const Banner: Model<IBanner> = mongoose.model<IBanner>('Banner', bannerSchema);
 const TermsConditions = mongoose.model('TermsConditions', termsAndConditionsSchema);
 const PrivacyPolicy = mongoose.model('PrivacyPolicy', privacyPolicySchema);
 const AboutUs = mongoose.model('AboutUs', aboutUsSchema);
 const Blogs: Model<IBlog> = mongoose.model<IBlog>('Blog', BlogSchema);
 const ContactUs: Model<IContactSupport> = mongoose.model<IContactSupport>('ContactUs', ContactUsSchema);
 
-export { Subscription, Comment, Review, Category, TermsConditions, PrivacyPolicy, AboutUs, Blogs, ContactUs };
+export { Subscription, Comment, Review, Category, TermsConditions, PrivacyPolicy, AboutUs, Blogs, ContactUs, Banner };
 
