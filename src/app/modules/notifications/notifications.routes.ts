@@ -12,7 +12,7 @@ router.get(
 );
 router.patch(
   '/update-notification',
-  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.USER, ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.SUPER_ADMIN),
   NotificationController.updateAll,
 );
 router.patch(

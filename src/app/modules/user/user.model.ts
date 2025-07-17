@@ -88,6 +88,10 @@ const UserSchema = new Schema<IUser>(
       type: String,
       default: null,
     },
+    careerObjective: {
+      type: String,
+      default: null,
+    },
     job_title: {
       type: [String],
       default: [],

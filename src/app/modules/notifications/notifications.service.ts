@@ -39,12 +39,16 @@ const updateNotification = async (req: Request) => {
   return result;
 };
 
-const updateAll = async () => {
+const updateAll = async (user: IReqUser) => {
+  const userId = user?.userId
+  if (!userId) {
+    throw new ApiError(404, "User is missing!")
+  }
   const result = await Notification.updateMany(
-    { status: false },
-    { $set: { status: true } },
-    { new: true },
+    { status: false, userId },
+    { $set: { status: true } }
   ).sort({ createdAt: -1 });
+
   return result;
 };
 

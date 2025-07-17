@@ -30,7 +30,7 @@ const updateNotification: RequestHandler = catchAsync(
 );
 const updateAll: RequestHandler = catchAsync(
   async (req: Request, res: Response) => {
-    const result = await NotificationService.updateAll();
+    const result = await NotificationService.updateAll(req.user as IReqUser);
     sendResponse(res, {
       statusCode: 200,
       success: true,

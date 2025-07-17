@@ -40,6 +40,7 @@ export interface IUser extends Document {
   locations: any;
   resume: string | undefined;
   plan_id: mongoose.Types.ObjectId;
+  careerObjective: string;
 }
 
 export interface IEducational {
