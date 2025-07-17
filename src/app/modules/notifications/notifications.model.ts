@@ -37,7 +37,7 @@ const notificationSchema = new Schema<INotification>(
     },
     status: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   {
