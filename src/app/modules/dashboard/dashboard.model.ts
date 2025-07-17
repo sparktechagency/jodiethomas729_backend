@@ -88,6 +88,15 @@ const termsAndConditionsSchema = new mongoose.Schema(
     }
 );
 
+const cookieTextSchema = new mongoose.Schema(
+    {
+        description: {
+            type: String,
+            required: true,
+        },
+    }
+);
+
 const bannerSchema = new Schema<IBanner>(
     {
         name: {
@@ -170,10 +179,11 @@ const Review: Model<IReview> = mongoose.model<IReview>('Review', ReviewSchema);
 const Category: Model<ICategory> = mongoose.model<ICategory>('Category', categorySchema);
 const Banner: Model<IBanner> = mongoose.model<IBanner>('Banner', bannerSchema);
 const TermsConditions = mongoose.model('TermsConditions', termsAndConditionsSchema);
+const CookieText = mongoose.model('CookieText', cookieTextSchema);
 const PrivacyPolicy = mongoose.model('PrivacyPolicy', privacyPolicySchema);
 const AboutUs = mongoose.model('AboutUs', aboutUsSchema);
 const Blogs: Model<IBlog> = mongoose.model<IBlog>('Blog', BlogSchema);
 const ContactUs: Model<IContactSupport> = mongoose.model<IContactSupport>('ContactUs', ContactUsSchema);
 
-export { Subscription, Comment, Review, Category, TermsConditions, PrivacyPolicy, AboutUs, Blogs, ContactUs, Banner };
+export { Subscription, Comment, Review, Category, TermsConditions, PrivacyPolicy, AboutUs, Blogs, ContactUs, Banner, CookieText };
 

@@ -1,7 +1,7 @@
 import QueryBuilder from "../../../builder/QueryBuilder";
 import ApiError from "../../../errors/ApiError";
 import User from "../user/user.model";
-import { AboutUs, Banner, Blogs, Category, ContactUs, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
+import { AboutUs, Banner, Blogs, Category, ContactUs, CookieText, PrivacyPolicy, Subscription, TermsConditions } from "./dashboard.model";
 import { IBlog, ICategory, ISubscriptions } from "./dsashbaord.interface";
 import { logger } from "../../../shared/logger";
 import { Transaction } from "../payment/payment.model";
@@ -713,7 +713,6 @@ const getAllBlogs = async (query: any) => {
     };
 };
 
-
 const getBlogDetailsAndRelated = async (id: string) => {
     const blog = await Blogs.findById(id)
         .populate('category')
@@ -795,10 +794,25 @@ const replyToContactUs = async (reply: string, id: string) => {
         html
     }).catch((error) => console.error("Failed to send email:", error.message));
 
-
     return contact;
 };
+// =========================
+const addCookieText = async (payload: any) => {
+    const checkIsExist = await CookieText.findOne();
+    if (checkIsExist) {
+        return await CookieText.findOneAndUpdate({}, payload, {
+            new: true,
 
+            runValidators: true,
+        });
+    } else {
+        return await CookieText.create(payload);
+    }
+};
+
+const getCookieText = async () => {
+    return await CookieText.findOne();
+};
 
 
 
@@ -842,5 +856,7 @@ export const DashboardService = {
     deleteBanner,
     updateBanner,
     allBanner,
-    bannerInsertIntoDB
+    bannerInsertIntoDB,
+    addCookieText,
+    getCookieText
 };

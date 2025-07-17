@@ -208,7 +208,26 @@ const allBanner = catchAsync(async (req: Request, res: Response) => {
     data: result.data,
   });
 });
+// ============================
+const addCookieText = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.addCookieText(req.body);
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successful',
+    data: result,
+  });
+});
 
+const getCookieText = catchAsync(async (req: Request, res: Response) => {
+  const result = await DashboardService.getCookieText();
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: 'Successful',
+    data: result,
+  });
+});
 // ===========================
 const addTermsConditions = catchAsync(async (req: Request, res: Response) => {
   const result = await DashboardService.addTermsConditions(req.body);
@@ -532,5 +551,7 @@ export const DashboardController = {
   updateBanner,
   allBanner,
   bannerInsertIntoDB,
-  deleteBanner
+  deleteBanner,
+  getCookieText,
+  addCookieText
 };

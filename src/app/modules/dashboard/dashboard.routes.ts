@@ -87,6 +87,15 @@ router.delete(
   DashboardController.deleteBanner,
 );
 
+router.post('/cookie-text',
+  DashboardController.addTermsConditions,
+);
+router.get('/cookie-text',
+  DashboardController.getTermsConditions,
+);
+
+
+
 
 // =========================================
 router.get(
