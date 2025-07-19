@@ -3,11 +3,13 @@ import auth from '../../middlewares/auth';
 import { ENUM_USER_ROLE } from '../../../enums/user';
 import { JobsController } from './jobs.controller';
 import uploadC from '../../middlewares/cloudinaryUpload';
+import { checkUserStatus } from '../../middlewares/checkUserStatus';
 
 const router = express.Router();
 
 router.post('/create-jobs',
     auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
+    checkUserStatus,
     JobsController.createNewJobs);
 router.patch('/update-jobs/:id',
     auth(ENUM_USER_ROLE.EMPLOYER, ENUM_USER_ROLE.ADMIN),
