@@ -1,11 +1,11 @@
 import config from "../config";
 
 interface ContactUsReplyEmailData {
-    name: string;
-    email: string;
-    subject: string;
-    message: string;
-    reply: string;
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  reply: string;
 }
 
 const contactUsReplyTemplate = (data: ContactUsReplyEmailData): string => `
@@ -99,8 +99,8 @@ const contactUsReplyTemplate = (data: ContactUsReplyEmailData): string => `
   
           <div class="footer">
             &copy; ${new Date().getFullYear()} ${config.app_name} Website. All rights reserved.<br />
-            <a href="https://matchmaker.com/contact">Contact Support</a> | 
-            <a href="https://matchmaker.com/terms-condition">Privacy Policy</a>
+            <a href="https://www.machmakers.co.uk/contact">Contact Support</a> | 
+            <a href="https://www.machmakers.co.uk/privacy-policy">Privacy Policy</a>
           </div>
         </div>
       </body>
