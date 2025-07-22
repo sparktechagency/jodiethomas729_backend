@@ -412,7 +412,7 @@ const resendCodeActivationAccount = async (payload: { email: string }) => {
             <p>Please use this code to activate your account. If you did not request this, please ignore this email.</p>
             <p>Thank you!</p>
             <div class="footer">
-                <p>&copy; ${new Date().getFullYear()} bdCalling</p>
+                <p>&copy; ${new Date().getFullYear()} Machmakers</p>
             </div>
         </div>
     </body>
@@ -480,7 +480,7 @@ const resendCodeForgotAccount = async (payload: ForgotPasswordPayload) => {
             <p>Please use this code to activate your account. If you did not request this, please ignore this email.</p>
             <p>Thank you!</p>
             <div class="footer">
-                <p>&copy; ${new Date().getFullYear()} bdCalling</p>
+                <p>&copy; ${new Date().getFullYear()} Machmakers</p>
             </div>
         </div>
     </body>
