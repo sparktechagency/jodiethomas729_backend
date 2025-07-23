@@ -568,11 +568,15 @@ const deleteMyAccount = async (payload: { authId: Types.ObjectId }) => {
 };
 
 const blockUnblockAuthUser = async (payload: {
-  role: string, email: string, is_block: boolean
+  role: string;
+  email: string;
+  is_block: boolean;
 }) => {
   const { role, email, is_block } = payload;
-  console.log("USER", role, email, is_block)
+  console.log("USER", role, email, is_block);
+
   try {
+    // Update the Auth user first
     const updatedAuth = await Auth.findOneAndUpdate(
       { email: email, role: role },
       { $set: { is_block } },
@@ -586,12 +590,32 @@ const blockUnblockAuthUser = async (payload: {
       throw new ApiError(httpStatus.NOT_FOUND, "User not found");
     }
 
+    // Get the corresponding status
+    const statusValue = is_block ? "deactivate" : "active";
+
+    // Apply to User or Employer
+    if (role === "USER") {
+      await User.findOneAndUpdate(
+        { authId: updatedAuth._id },
+        { $set: { status: statusValue } }
+      );
+    } else if (role === "EMPLOYER") {
+      await Employer.findOneAndUpdate(
+        { authId: updatedAuth._id },
+        { $set: { status: statusValue } }
+      );
+    }
+
     return updatedAuth;
 
   } catch (error: any) {
-    throw new ApiError(httpStatus.NOT_FOUND, "An unexpected error" + " " + error.message);
+    throw new ApiError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "An unexpected error: " + error.message
+    );
   }
 };
+
 
 const myProfile = async (user: { userId: string, role: string }) => {
   const { userId, role } = user;
