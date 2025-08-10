@@ -616,7 +616,6 @@ const blockUnblockAuthUser = async (payload: {
   }
 };
 
-
 const myProfile = async (user: { userId: string, role: string }) => {
   const { userId, role } = user;
   let result;
@@ -635,8 +634,6 @@ const myProfile = async (user: { userId: string, role: string }) => {
   }
   return result;
 };
-
-
 
 export const AuthService = {
   registrationAccount,

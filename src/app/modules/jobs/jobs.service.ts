@@ -787,6 +787,7 @@ const getRecentJobs = async (query: any) => {
 // };
 // =========================================
 const getSearchFilterJobs = async (query: any) => {
+
     let {
         experience,
         types,
@@ -878,7 +879,6 @@ const getSearchFilterJobs = async (query: any) => {
         },
     };
 };
-
 
 const getJobsDetailsForCandidate = async (jobId: any) => {
 
@@ -1066,7 +1066,6 @@ const getJobsDetailsForCandidate = async (jobId: any) => {
 //         }
 //     };
 // };
-
 
 const searchCandidate = async (user: IReqUser, query: any) => {
     const {
