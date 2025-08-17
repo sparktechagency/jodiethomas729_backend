@@ -1114,7 +1114,7 @@ const searchCandidate = async (user: IReqUser, query: any) => {
             "name",
             "email",
             "job_title",
-            "profile_image",
+            // "profile_image",
             "skill",
             "details",
             "address",
