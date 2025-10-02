@@ -9,7 +9,6 @@ import ApiError from "../../../errors/ApiError";
 import User from "../user/user.model";
 import { Category } from "../dashboard/dashboard.model";
 import Notification from "../notifications/notifications.model";
-import { IUser } from "../user/user.interface";
 import httpStatus from "http-status";
 import Employer from "../employer/employer.model";
 
@@ -123,7 +122,6 @@ const updateJobs = async (jobId: string, payload: Partial<IJobs>) => {
     }
 };
 
-
 const jobsDeleteById = async (jobId: string) => {
     try {
         if (!Types.ObjectId.isValid(jobId)) {
@@ -147,7 +145,6 @@ const jobsDeleteById = async (jobId: string) => {
         );
     }
 };
-
 
 const getEmployerJobs = async (user: IReqUser, query: any) => {
     const { page, limit } = query;
