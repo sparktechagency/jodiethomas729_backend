@@ -21,6 +21,7 @@ const createNewJob = async (user: IReqUser, payload: IJobs) => {
         if (!user) {
             throw new AppError(404, 'Access denied. Only employers are allowed.');
         }
+        // =====check subscription status
         if (user.subscription_status !== 'Active') {
             throw new AppError(403, 'Your subscription is not active. Please subscribe to post a job.');
         }
