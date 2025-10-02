@@ -17,6 +17,14 @@ const createNewJob = async (user: IReqUser, payload: IJobs) => {
     const { authId, userId } = user;
     try {
 
+        const user = await Employer.findById(userId);
+        if (!user) {
+            throw new AppError(404, 'Access denied. Only employers are allowed.');
+        }
+        if (user.subscription_status !== 'Active') {
+            throw new AppError(403, 'Your subscription is not active. Please subscribe to post a job.');
+        }
+
         const parsedData = jobValidationSchema.parse(payload);
 
         const locations = {
