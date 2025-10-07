@@ -72,7 +72,7 @@ const createCheckoutSessionStripe = async (req: any) => {
             payment_method_types: ['card'],
             mode: 'payment',
             success_url: `${DOMAIN_URL}/payment/payment-success/{CHECKOUT_SESSION_ID}`,
-            cancel_url: `${DOMAIN_URL}/cancel`,
+            cancel_url: `${DOMAIN_URL}/dashboard/employer/subscription`,
             customer_email: `${user?.email}`,
             client_reference_id: subscriptionId,
             metadata: {

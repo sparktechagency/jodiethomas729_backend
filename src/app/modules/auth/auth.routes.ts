@@ -11,7 +11,7 @@ import uploadC from '../../middlewares/cloudinaryUpload';
 import { resumeUpload } from '../../middlewares/catchMulter';
 
 const router = express.Router();
-//------ Auth Route -----------------
+//------ Auth Route ---------
 router.post("/register", AuthController.registrationAccount)
 router.post("/login", AuthController.loginAccount)
 router.post("/activate-user", AuthController.activateAccount)
