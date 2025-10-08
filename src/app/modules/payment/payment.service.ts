@@ -66,7 +66,7 @@ const createCheckoutSessionStripe = async (req: any) => {
             throw new ApiError(httpStatus.NOT_FOUND, 'invalid subscription ID.');
         }
 
-        const unitAmount = Number(subscription.price) * 100;
+        const unitAmount = Math.round(Number(subscription.price) * 100)
 
         let session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
@@ -83,7 +83,7 @@ const createCheckoutSessionStripe = async (req: any) => {
             line_items: [
                 {
                     price_data: {
-                        currency: 'usd',
+                        currency: 'gbp',
                         unit_amount: unitAmount,
                         product_data: {
                             name: subscription.name,
@@ -135,6 +135,7 @@ const stripeCheckAndUpdateStatusSuccess = async (req: any) => {
         }
 
         const amount = Number(session.amount_total) / 100;
+        const currency = session.currency?.toUpperCase() || "GBP";
 
         const transactionData = {
             subscriptionId,
@@ -146,9 +147,10 @@ const stripeCheckAndUpdateStatusSuccess = async (req: any) => {
             paymentDetails: {
                 email: session.customer_email,
                 payId: sessionId,
-                currency: "USD"
+                currency,
             }
         };
+
         const newTransaction = await Transaction.create(transactionData);
 
         let user
@@ -160,7 +162,6 @@ const stripeCheckAndUpdateStatusSuccess = async (req: any) => {
             throw new ApiError(httpStatus.BAD_REQUEST, 'Some thing was wrong.')
         }
 
-        // let user = await User.findById(payUser) as any; 
         const expiryDate = new Date();
 
         if (subscription.validation === "Monthly") {
