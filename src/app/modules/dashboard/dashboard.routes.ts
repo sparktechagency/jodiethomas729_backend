@@ -65,6 +65,7 @@ router.delete(
   auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   DashboardController.deleteCategory,
 );
+
 // Banner =========================================
 router.post('/create-banner',
   // auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
@@ -87,15 +88,13 @@ router.delete(
   DashboardController.deleteBanner,
 );
 
+// ====================
 router.post('/cookie-text',
-  DashboardController.addTermsConditions,
+  DashboardController.getCookieText,
 );
 router.get('/cookie-text',
-  DashboardController.getTermsConditions,
+  DashboardController.addCookieText,
 );
-
-
-
 
 // =========================================
 router.get(
