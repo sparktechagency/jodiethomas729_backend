@@ -103,6 +103,10 @@ const bannerSchema = new Schema<IBanner>(
             type: String,
             required: true,
         },
+        url: {
+            type: String,
+            required: true,
+        },
         image: {
             type: String,
             required: true,

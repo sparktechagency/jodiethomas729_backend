@@ -76,6 +76,7 @@ export type ICategory = {
 
 export type IBanner = {
   image: string;
+  url: string;
   name: string;
 };
 

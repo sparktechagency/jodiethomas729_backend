@@ -397,7 +397,6 @@ const bannerInsertIntoDB = async (files: any, payload: ICategory) => {
 
 const allBanner = async (query: Record<string, unknown>) => {
     const result = await Banner.find().sort({ createdAt: -1 })
-
     return {
         data: result,
     };
